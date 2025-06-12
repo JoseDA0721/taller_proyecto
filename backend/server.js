@@ -22,7 +22,7 @@ app.get('/', (req, res) => {
 });
 
 // Rutas de la API
-app.use('/api/clientes', clienteRoutes);
+app.use('/api', clienteRoutes);
 app.use('/api/vehiculos', vehiculoRoutes);
 app.use('/api/ordenes', ordenRoutes);
 app.use('/api/catalogos', catalogoRoutes);
