@@ -56,10 +56,20 @@ exports.updateVehiculo = async(req, res) =>{res.status(400).json("No implementad
 
 exports.deleteVehiculo = async (req, res) => {
     const { placa } = req.params;
+    console.log('Placa: ',placa);
     try {
-        const query = 'DELETE FROM vehiculos WHERE placa == $1';
-        const result = await pool.query(query, placa);
-            res.status(200).json({message: 'Vehiculo existosamente.'});
+        const query = 'DELETE FROM vehiculos WHERE placa = $1 RETURNING *';
+        const result = await pool.query(query, [placa]);
+
+        // Verificamos si la consulta devolvió la fila que eliminó
+        if (result.rowCount === 0) {
+            // Si rowCount es 0, no se encontró el vehículo y no se borró nada
+            return res.status(404).json({ message: 'Vehículo no encontrado.' });
+        }
+        
+        // Si rowCount es > 0, el vehículo fue eliminado
+        res.status(200).json({ message: `Vehículo con placa ${placa} eliminado exitosamente.` });
+
     } catch (error) {
         res.status(500).json({ error: err.message });
     }  
