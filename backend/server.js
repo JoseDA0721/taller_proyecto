@@ -24,8 +24,8 @@ app.get('/', (req, res) => {
 // Rutas de la API
 app.use('/api', clienteRoutes);
 app.use('/api', vehiculoRoutes);
-app.use('/api/ordenes', ordenRoutes);
-app.use('/api/catalogos', catalogoRoutes);
+app.use('/api', ordenRoutes);
+app.use('/api', catalogoRoutes);
 
 
 // Definir el puerto y arrancar el servidor

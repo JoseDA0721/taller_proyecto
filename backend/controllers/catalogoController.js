@@ -1,4 +1,4 @@
-const { quitoPool: catalogPool } = require('../config/db'); // Todos los catálogos están en Quito
+const { quitoPool: catalogPool } = require('../config/db');
 
 exports.getServicios = async (req, res) => {
     try {
@@ -18,6 +18,17 @@ exports.getTiposVehiculo = async (req, res) => {
      try {
         const result = await catalogPool.query('SELECT * FROM tipos_vehiculos ORDER BY nombre');
         res.status(200).json(result.rows);
-    } catch (err) { res.status(500).json({ error: err.message }); }
+    } catch (err) { 
+        res.status(500).json({ error: err.message }); 
+    }
+};
+
+exports.getProductos = async (req, res) => {
+    try {
+        const result = await catalogPool.query('SELECT * FROM productos ORDER BY nombre');
+        res.status(200).json(result.rows);
+    } catch (err) {
+        res.status(500).json({error: err.message});    
+    }    
 };
 

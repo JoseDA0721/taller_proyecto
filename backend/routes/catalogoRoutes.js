@@ -1,14 +1,15 @@
-const express_catalogo = require('express');
-const router_catalogo = express_catalogo.Router();
+const express = require('express');
+const router = express.Router();
 const {
     getServicios,
     getCiudades,
-    getTiposVehiculo
+    getTiposVehiculo,
+    getProductos
 } = require('../controllers/catalogoController');
 
-router_catalogo.get('/servicios', getServicios);
-router_catalogo.get('/ciudades', getCiudades);
+router.get('/servicios', getServicios);
+router.get('/ciudades', getCiudades);
+router.get('/tipos-vehiculo', getTiposVehiculo);
+router.get('/productos', getProductos);
 
-router_catalogo.get('/tipos-vehiculo', getTiposVehiculo);
-
-module.exports = router_catalogo;
+module.exports = router;
