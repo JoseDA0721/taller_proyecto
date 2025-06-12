@@ -2,12 +2,40 @@ const { quitoPool: pool } = require('../config/db'); // Los vehÃ­culos solo estÃ
 
 exports.getAllVehiculos = async (req, res) => {
     try {
-        const result = await pool.query('SELECT * FROM vehiculos ORDER BY placa');
+        const result = await pool.query('SELECT * FROM vehiculos');
         res.status(200).json(result.rows);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 };
+
+exports.getVehiculoByPlaca = async (req, res) =>{
+    const { placa } = req.params;
+    try {
+        const result = await pool.query('SELECT * FROM vehiculos WHERE placa = $1',[placa]);
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: 'Vehiculo no encontrado' });
+        }
+        res.status(200).json(result.rows);
+    } catch (error) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+exports.getVehiculoByCliente = async (req, res) =>{
+    const { cliente_cedula } = req.params;
+    console.log('cedula_cliente:', cliente_cedula);
+    try {
+        const result = await pool.query('SELECT * FROM vehiculos WHERE cliente_cedula = $1',[cliente_cedula]);
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: 'Vehiculo no encontrado' });
+        }
+        res.status(200).json(result.rows);
+    } catch (error) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
 
 exports.createVehiculo = async (req, res) => {
     const { placa, marca, modelo, tipo_id, cliente_cedula } = req.body;
@@ -23,3 +51,17 @@ exports.createVehiculo = async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 };
+
+exports.updateVehiculo = async(req, res) =>{res.status(400).json("No implementado");};
+
+exports.deleteVehiculo = async (req, res) => {
+    const { placa } = req.params;
+    try {
+        const query = 'DELETE FROM vehiculos WHERE placa == $1';
+        const result = await pool.query(query, placa);
+            res.status(200).json({message: 'Vehiculo existosamente.'});
+    } catch (error) {
+        res.status(500).json({ error: err.message });
+    }  
+};
+
