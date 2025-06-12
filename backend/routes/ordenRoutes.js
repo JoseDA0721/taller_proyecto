@@ -1,10 +1,11 @@
-const express_orden = require('express');
-const router_orden = express_orden.Router();
+const express = require('express');
+const router = express.Router();
 const {
     getAllOrdenes,
     createOrden
 } = require('../controllers/ordenController');
 
-router_orden.route('/').get(getAllOrdenes).post(createOrden);
+router.get('/ordenes', getAllOrdenes);
+router.post('/orden', createOrden);
 
-module.exports = router_orden;
+module.exports = router;
