@@ -1,4 +1,5 @@
 const { quitoPool, getPoolByCity } = require('../config/db');
+const { findClientNode } = require('../utils/dbHelpers');
 
 // Obtener todos los clientes (usando la vista global)
 exports.getAllClientes = async (req, res) => {
@@ -85,16 +86,10 @@ exports.createCliente = async (req, res) => {
 exports.updateCliente = async (req, res) => { 
     const { cedula } = req.params;
     const { nombre, telefono, correo } = req.body;
-    console.log('Cedula: ',cedula)
-    console.log('Datos:',req.body);
     let pool;
     let client;
     try {
-        const result = await quitoPool.query('SELECT ciudad_id FROM clientes_global WHERE cedula = $1', [cedula]);
-        if (result.rows.length === 0) {
-            return res.status(404).json({ message: 'Cliente no encontrado' });
-        }
-        const ciudad_id = result.rows[0].ciudad_id;
+        const ciudad_id = await findClientNode(cedula);
         console.log('Ciudad encontrada:', ciudad_id);
         pool = getPoolByCity(ciudad_id);
         const suffix = ciudad_id === 1 ? 'quito' : ciudad_id === 2 ? 'guayaquil' : 'cuenca';
@@ -129,15 +124,10 @@ exports.updateCliente = async (req, res) => {
 
 exports.deleteCliente = async (req, res) => { 
     const { cedula } = req.params;
-    console.log('Cedula: ',cedula)
     let pool;
     let client;
     try {
-        const result = await quitoPool.query('SELECT ciudad_id FROM clientes_global WHERE cedula = $1', [cedula]);
-        if (result.rows.length === 0) {
-            return res.status(404).json({ message: 'Cliente no encontrado' });
-        }
-        const ciudad_id = result.rows[0].ciudad_id;
+        const ciudad_id = await findClientNode(cedula);
         console.log('Ciudad encontrada:', ciudad_id);
         pool = getPoolByCity(ciudad_id);
         const suffix = ciudad_id === 1 ? 'quito' : ciudad_id === 2 ? 'guayaquil' : 'cuenca';
