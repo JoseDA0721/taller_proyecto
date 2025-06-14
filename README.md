@@ -1,95 +1,240 @@
 # API para Sistema de Gestión de Taller Mecánico
 
-Este repositorio contiene el backend para un sistema de gestión de taller, construido con Node.js, Express y una arquitectura de base de datos distribuida sobre PostgreSQL. El objetivo principal es simular un entorno empresarial real donde los datos se fragmentan geográficamente para mejorar el rendimiento y la disponibilidad local.
+Este repositorio contiene el backend para un sistema de gestión de taller, construido con **Node.js**, **Express** y una arquitectura de base de datos **distribuida sobre PostgreSQL**. El objetivo principal es simular un entorno empresarial real donde los datos se fragmentan geográficamente para mejorar el rendimiento y la disponibilidad local.
 
 ---
 
-## Arquitectura de la Base de Datos
+## 🏛️ Arquitectura de la Base de Datos
 
-El núcleo de este proyecto es su **base de datos distribuida**, fragmentada en tres nodos que representan diferentes sucursales:
+El sistema se basa en una base de datos distribuida fragmentada en tres nodos:
 
-1.  **Nodo 1 (Quito):** Es el nodo principal. Aloja:
-    * Tablas de catálogo y centralizadas (ej. `vehiculos`, `servicios`, `productos`).
-    * Fragmentos de datos que pertenecen únicamente a la sucursal de Quito.
-    * **Vistas globales** (`clientes_global`, `ordenes_trabajo_global`) que unifican los datos de todos los nodos.
-    * **Triggers y funciones** para mantener la integridad referencial a través de los nodos.
+### Nodo 1 (Quito): Nodo principal
 
-2.  **Nodo 2 (Guayaquil):** Nodo secundario que aloja únicamente los fragmentos de datos de la sucursal de Guayaquil.
+- Tablas de catálogo y centralizadas (vehículos, servicios, productos)
+- Fragmentos de datos de Quito
+- Vistas globales (`clientes_global`, `ordenes_trabajo_global`)
+- Triggers y funciones para mantener integridad entre nodos
 
-3.  **Nodo 3 (Cuenca):** Nodo secundario que aloja únicamente los fragmentos de datos de la sucursal de Cuenca.
+### Nodo 2 (Guayaquil): Nodo secundario
 
-Se utiliza una estrategia de **fragmentación mixta**:
+- Fragmentos de datos de la sucursal de Guayaquil
 
-* **Horizontal:** Para tablas como `ordenes_trabajo` e `inventario`, divididas por `ciudad_id`.
-* **Vertical y Horizontal:** Para `clientes` y `empleados`, que se dividen primero por tipo de información y luego por ciudad.
+### Nodo 3 (Cuenca): Nodo secundario
 
----
+- Fragmentos de datos de la sucursal de Cuenca
 
-## Tecnologías Utilizadas
+### Estrategia de Fragmentación:
 
-* **Backend:** Node.js
-* **Framework:** Express.js
-* **Base de Datos:** PostgreSQL
-* **Driver de PostgreSQL:** `node-postgres` (pg)
-* **Gestión de Peticiones:** `cors`
-* **Variables de Entorno:** `dotenv`
-* **Desarrollo:** `nodemon`
+- **Horizontal**: Ej. `ordenes_trabajo`, `inventario` por `ciudad_id`
+- **Mixta (Vertical + Horizontal)**: Ej. `clientes`, `empleados`
+
+### Generación de IDs Únicos:
+
+- Prefijos como `OQ-`, `OG-`, `OC-` según la ciudad para mantener unicidad global
 
 ---
 
-## Instalación y Puesta en Marcha
+## 🚀 Tecnologías Utilizadas
 
-Sigue estos pasos para levantar el entorno de desarrollo local.
+- **Backend**: Node.js
+- **Framework**: Express.js
+- **Base de Datos**: PostgreSQL
+- **ORM / Driver**: node-postgres (`pg`)
+- **CORS**: cors
+- **Variables de entorno**: dotenv
+- **Desarrollo**: nodemon
+- **Contenedores**: Docker + Docker Compose
 
-### Prerrequisitos
+---
 
-* Node.js (v16 o superior)
-* NPM (generalmente se instala con Node.js)
-* Tener 3 instancias de PostgreSQL accesibles en la red, representando cada nodo.
+## 📅 Instalación y Puesta en Marcha
 
-### 1. Preparar la Base de Datos
-Antes de iniciar el backend, es **imprescindible** que las bases de datos estén correctamente configuradas y pobladas. Sigue la guía de ejecución de los scripts SQL del proyecto:
-1.  Carga el script de datos centralizados en cada nodo.
-2.  Ejecuta los scripts de fragmentación en el orden correcto (Nodo 2, Nodo 3, y finalmente Nodo 1).
-3.  Ejecuta los scripts de limpieza para eliminar las tablas temporales.
+### Requisitos Previos
 
-### 2. Configurar el Backend
-1.  Clona este repositorio.
-2.  Navega a la carpeta `/backend`.
-3.  Crea un archivo llamado `.env` en la raíz de `/backend`. Copia el contenido del archivo de configuración y rellena las credenciales y direcciones IP/puertos de tus 3 instancias de PostgreSQL.
-4.  Instala las dependencias del proyecto ejecutando:
-    ```bash
-    npm install
-    ```
+- Node.js (v16+)
+- NPM
+- Git
+- Docker y Docker Compose
 
-### 3. Iniciar el Servidor
-Para iniciar el servidor en modo de desarrollo (con reinicio automático al detectar cambios), ejecuta:
+### Paso 1: Clonar Repositorio
+Clona el repositorio como prefieras. Por ejemplo con Git usa:
 ```bash
+git clone <URL_DEL_REPOSITORIO>
+cd <nombre_de_la_carpeta_del_proyecto>
+```
+
+### Paso 2: Levantar la Base de Datos con Docker
+
+Estructura esperada:
+
+```
+/
+├── backend/
+├── init-db/
+│   ├── quito/init.sql
+│   ├── guayaquil/init.sql
+│   └── cuenca/init.sql
+└── docker-compose.yml
+```
+
+Levantar los contenedores:
+
+```bash
+docker-compose up -d
+```
+
+Verificar:
+
+```bash
+docker ps
+```
+
+Deberías ver: `taller_quito_db`, `taller_guayaquil_db`, `taller_cuenca_db`
+
+### Paso 3: Configurar el Backend
+
+```bash
+cd backend
+```
+
+Crear archivo `.env` en `/backend`:
+
+```dotenv
+NODE_ENV=development
+PORT=5000
+
+DB_USER_QUITO=taller_user
+DB_HOST_QUITO=localhost
+DB_DATABASE_QUITO=taller_db
+DB_PASSWORD_QUITO=taller_password_local
+DB_PORT_QUITO=5433
+
+DB_USER_GUAYAQUIL=taller_user
+DB_HOST_GUAYAQUIL=localhost
+DB_DATABASE_GUAYAQUIL=taller_db
+DB_PASSWORD_GUAYAQUIL=taller_password_local
+DB_PORT_GUAYAQUIL=5434
+
+DB_USER_CUENCA=taller_user
+DB_HOST_CUENCA=localhost
+DB_DATABASE_CUENCA=taller_db
+DB_PASSWORD_CUENCA=taller_password_local
+DB_PORT_CUENCA=5435
+```
+
+### Paso 4: Instalar Dependencias y Ejecutar
+
+```bash
+npm install
 npm run dev
 ```
-Si todo está correcto, verás un mensaje en la consola:Servidor corriendo en http://localhost:5000
 
-### Estructura del Proyecto/backend/
-```bash
-├── /config/
-│   └── db.js         # Configuración de los pools de conexión a cada nodo
-├── /controllers/
-│   └── *.js          # Lógica de negocio y consultas SQL
-├── /routes/
-│   └── *.js          # Definición de los endpoints de la API
-├── .env              # Variables de entorno (¡No subir a Git!)
-├── package.json
-└── server.js         # Punto de entrada de la aplicación Express
+Salida esperada:
+
 ```
-### Endpoints Principales de la API
-MétodoEndpointDescripción
-* GET/api/clientes: Obtiene una lista de todos los clientes de todos los nodos.
-* POST/api/clientes: Crea un nuevo cliente en el nodo correspondiente a su ciudad_id.
-* GET/api/clientes/{cedula}: Busca un cliente por su cédula en todos los nodos.
-* GET/api/vehiculos: Obtiene todos los vehículos (tabla centralizada en Nodo 1).
-* POST/api/vehiculos: Crea un nuevo vehículo. El trigger en la BD valida que el cliente exista.
-* GET/api/ordenes: Obtiene una lista de todas las órdenes de todos los nodos.
-* POST/api/ordenes: Crea una nueva orden de trabajo (transacción distribuida).
-* GET/api/catalogos/servicios: Obtiene la lista de todos los servicios disponibles.
-* GET/api/catalogos/ciudades: Obtiene la lista de ciudades (sucursales).
-* GET/api/catalogos/tipos-vehiculo: Obtiene la lista de tipos de vehiculos.
+Servidor corriendo en http://localhost:5000
+```
+
+---
+
+## 📁 Estructura del Proyecto
+
+```
+/backend/
+├── /config/           # Configuración DB
+├── /controllers/      # Lógica de negocio
+├── /routes/           # Endpoints
+├── /utils/            # Utilidades para DB
+├── .env               # Variables de entorno
+├── .gitignore
+├── package.json
+└── server.js          # Entry point
+```
+
+---
+
+## 🔗 Endpoints Principales de la API
+
+| Método | Endpoint                        | Descripción                                   |
+| ------ | ------------------------------- | --------------------------------------------- |
+| GET    | `/api/clientes`                 | Lista global de clientes                      |
+| POST   | `/api/clientes`                 | Crear cliente según `ciudad_id`               |
+| GET    | `/api/clientes/{cedula}`        | Buscar cliente por cédula                     |
+| GET    | `/api/vehiculos`                | Vehículos (Nodo 1)                            |
+| POST   | `/api/vehiculos`                | Crear vehículo (valida existencia de cliente) |
+| GET    | `/api/ordenes`                  | Lista de órdenes de todos los nodos           |
+| POST   | `/api/ordenes`                  | Crear nueva orden (transacción distribuida)   |
+| GET    | `/api/catalogos/servicios`      | Lista de servicios                            |
+| GET    | `/api/catalogos/ciudades`       | Lista de sucursales                           |
+| GET    | `/api/catalogos/tipos-vehiculo` | Tipos de vehículo                             |
+
+---
+
+## 💾 Colección de Postman
+
+Puedes importar esta colección en Postman para probar los endpoints:
+
+- [Descargar colección](URL_COLECCION_POSTMAN)
+
+---
+
+## 📊 Uso Desde el Frontend (React)
+
+### Base de Axios
+
+```js
+// src/services/api.js
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: 'http://localhost:5000/api',
+});
+
+export default api;
+```
+
+### Ejemplo de Componente React
+
+```jsx
+// src/pages/Clientes.jsx
+import React, { useEffect, useState } from 'react';
+import api from '../services/api';
+
+function Clientes() {
+  const [clientes, setClientes] = useState([]);
+
+  useEffect(() => {
+    api.get('/clientes')
+      .then((res) => setClientes(res.data))
+      .catch((err) => console.error(err));
+  }, []);
+
+  return (
+    <div>
+      <h2>Clientes</h2>
+      <ul>
+        {clientes.map(cliente => (
+          <li key={cliente.cedula}>{cliente.nombre}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export default Clientes;
+```
+
+---
+
+## 🎉 Listo para Usar
+
+Si seguiste todos los pasos:
+
+- El backend está corriendo en `http://localhost:5000`
+- La base de datos distribuida está activa y conectada
+- Puedes usar Postman o conectar el frontend React directamente
+
+---
+
+🚀 **Comienza a construir tu frontend!**
+
