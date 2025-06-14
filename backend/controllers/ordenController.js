@@ -2,8 +2,22 @@ const { quitoPool, getPoolByCity } = require('../config/db');
 const { findClientNode } = require('../utils/dbHelpers');
 
 exports.getAllOrdenes = async (req, res) => {
+    const { ciudad } = req.query; 
     try {
-        const result = await quitoPool.query('SELECT * FROM ordenes_trabajo_global');
+        let result;
+        let query  = 'SELECT * FROM ordenes_trabajo_global';
+        const params = [];
+        if(ciudad){
+            const ciudadNormalizada = ciudad.toLowerCase();
+            const ciudadesValidas = ['quito', 'guayaquil', 'cuenca'];
+            if (!ciudadesValidas.includes(ciudadNormalizada)) {
+                return res.status(400).json({ message: 'Ciudad inválida' });
+            }
+            const ciudad_id = ciudadNormalizada === 'quito' ? 1 : ciudadNormalizada === 'guayaquil' ? 2 : 3;
+            query += ' WHERE ciudad_id = $1';
+            params.push(ciudad_id);
+        }
+        result = await quitoPool.query(query,params);
         res.status(200).json(result.rows);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -11,7 +25,7 @@ exports.getAllOrdenes = async (req, res) => {
 };
 
 exports.createOrden = async (req, res) => {
-    const { cliente_cedula, placa, fecha, estado, ciudad_id, empleado_id, form_pago_id, detalles } = req.body;
+    const { cliente_cedula, placa, fecha, estado, ciudad_id, empleado_cedula, form_pago_id, detalles } = req.body;
 
     if (!cliente_cedula || !placa || !ciudad_id || !detalles || !detalles.length) {
         return res.status(400).json({ message: 'Faltan datos críticos para crear la orden (cliente, placa, ciudad o detalles).' });
@@ -69,8 +83,8 @@ exports.createOrden = async (req, res) => {
         await centralClient.query('BEGIN');
 
         const suffix = ciudad_id === 1 ? 'quito' : ciudad_id === 2 ? 'guayaquil' : 'cuenca';
-        const ordenQuery = `INSERT INTO ordenes_trabajo_${suffix} (cliente_cedula, placa, fecha, estado, ciudad_id, empleado_id, form_pago_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING orden_id`;
-        const ordenResult = await client.query(ordenQuery, [cliente_cedula, placa, fecha, estado, ciudad_id, empleado_id, form_pago_id]);
+        const ordenQuery = `INSERT INTO ordenes_trabajo_${suffix} (cliente_cedula, placa, fecha, estado, ciudad_id, empleado_cedula, form_pago_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING orden_id`;
+        const ordenResult = await client.query(ordenQuery, [cliente_cedula, placa, fecha, estado, ciudad_id, empleado_cedula, form_pago_id]);
         const newOrdenId = ordenResult.rows[0].orden_id;
 
         await centralClient.query('ALTER TABLE detalles_orden DISABLE TRIGGER trg_check_orden_before_insert;');
@@ -104,15 +118,26 @@ exports.createOrden = async (req, res) => {
     }
 };
 
+exports.getOrden = async (req, res) => {
+    const { orden_id } = req.params;
+    console.log('orden_id:', orden_id);
+    try {
+        const query = `SELECT * FROM ordenes_trabajo_global WHERE orden_id = $1`
+        const result = await quitoPool.query(query, [orden_id]);
+        if(result.rows.length === 0){
+            return res.status(400).json({ message: 'ID de ciudad no válido.' });
+        }
+        res.status(200).json(result.rows);
+    } catch (error) {
+        res.status(500).json({error: error.message});
+    }  
+};
+
 exports.getOrdenesByCliente = async (req, res) => {
     try {
         const { cedula } = req.params;
-        const ciudad_id = await findClientNode(cedula);
-        console.log('ciudad:', ciudad_id);
-        const suffix = ciudad_id === 1 ? 'quito': ciudad_id === 2 ? 'guayaquil': cuenca;
-        console.log('Suffix:', suffix);
-        const query = `SELECT * FROM ordenes_trabajo_${suffix} WHERE cliente_cedula = $1`;
-        console.log('Query', query);
+        await findClientNode(cedula);
+        const query = `SELECT * FROM ordenes_trabajo_global WHERE cliente_cedula = $1`;
         const result = await quitoPool.query(query, [cedula]);
         res.status(200).json(result.rows);
     } catch (error) {

@@ -174,7 +174,7 @@ Servidor corriendo en http://localhost:5000
 
 Puedes importar esta colección en Postman para probar los endpoints:
 
-- [Descargar colección](URL_COLECCION_POSTMAN)
+- [Descargar colección](https://lunar-station-853811.postman.co/workspace/epn~2b6a9937-709b-4d85-b6ce-91dfc300f794/collection/37362830-af689790-f784-4489-bb57-182208dccafa?action=share&source=copy-link&creator=37362830)
 
 ---
 

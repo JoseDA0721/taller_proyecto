@@ -3,12 +3,14 @@ const router = express.Router();
 const {
     getAllOrdenes,
     createOrden,
+    getOrden,
     getOrdenesByCliente,
     updateOrden
 } = require('../controllers/ordenController');
 
 router.get('/ordenes', getAllOrdenes);
 router.post('/orden', createOrden);
+router.get('/orden/:orden_id', getOrden);
 router.get('/orden/:cedula', getOrdenesByCliente);
 router.put('/orden/:orden_id', updateOrden);
 

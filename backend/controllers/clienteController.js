@@ -153,15 +153,15 @@ exports.deleteCliente = async (req, res) => {
         //Inicio de transacción
         await client.query('BEGIN');
 
-        //Actualizar telefono
-        const queryDelInf = `DELETE  FROM info_clientes_${suffix} WHERE cedula = $1`;
-        await client.query(queryDelInf, [cedula]);
-
+        
         const queryDelTel = `DELETE  FROM telefono_clientes_${suffix} WHERE cedula = $1`;
         await client.query(queryDelTel, [cedula]);
-
+        
         const queryDelCorreo = `DELETE  FROM correo_clientes_${suffix} WHERE cedula = $1`;
         await client.query(queryDelCorreo, [cedula]);
+
+        const queryDelInf = `DELETE  FROM info_clientes_${suffix} WHERE cedula = $1`;
+        await client.query(queryDelInf, [cedula]);
         
         //COMMIT si no hubo errores
         await client.query('COMMIT');
