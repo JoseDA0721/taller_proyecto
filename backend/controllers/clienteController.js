@@ -3,11 +3,27 @@ const { findClientNode } = require('../utils/dbHelpers');
 
 // Obtener todos los clientes (usando la vista global)
 exports.getAllClientes = async (req, res) => {
+    const { ciudad } = req.query;
+
     try {
-        const result = await quitoPool.query('SELECT * FROM clientes_global');
+        let result;
+
+        if (!ciudad) {
+            result = await quitoPool.query('SELECT * FROM clientes_global');
+        } else {
+            const ciudadNormalizada = ciudad.toLowerCase();
+            const ciudadesValidas = ['quito', 'guayaquil', 'cuenca'];
+            if (!ciudadesValidas.includes(ciudadNormalizada)) {
+                return res.status(400).json({ message: 'Ciudad inválida' });
+            }
+            const ciudad_id = ciudadNormalizada === 'quito' ? 1 : ciudadNormalizada === 'guayaquil' ? 2 : 3;
+            const pool = getPoolByCity(ciudad_id);
+            const vista = `v_clientes_completos_${ciudadNormalizada}`;
+            result = await pool.query(`SELECT * FROM ${vista}`);
+        }
         res.status(200).json(result.rows);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: 'Error interno del servidor', details: err.message });
     }
 };
 

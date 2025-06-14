@@ -73,14 +73,14 @@ exports.createOrden = async (req, res) => {
         const ordenResult = await client.query(ordenQuery, [cliente_cedula, placa, fecha, estado, ciudad_id, empleado_id, form_pago_id]);
         const newOrdenId = ordenResult.rows[0].orden_id;
 
-        await centralClient.query('ALTER TABLE detalles_orden DISABLE TRIGGER trg_check_orden_before_insert_update;');
+        await centralClient.query('ALTER TABLE detalles_orden DISABLE TRIGGER trg_check_orden_before_insert;');
 
         for (const detalle of finalDetails) {
             const detalleQuery = 'INSERT INTO detalles_orden (orden_id, servicio_id, producto_id, cantidad, precio) VALUES ($1, $2, $3, $4, $5)';
             await centralClient.query(detalleQuery, [newOrdenId, detalle.servicio_id, detalle.producto_id, detalle.cantidad, detalle.precio]);
         }
         
-        await centralClient.query('ALTER TABLE detalles_orden ENABLE TRIGGER trg_check_orden_before_insert_update;');
+        await centralClient.query('ALTER TABLE detalles_orden ENABLE TRIGGER trg_check_orden_before_insert;');
         
         await client.query('COMMIT');
         await centralClient.query('COMMIT');
@@ -92,7 +92,7 @@ exports.createOrden = async (req, res) => {
         await centralClient.query('ROLLBACK');
 
         try {
-            await centralClient.query('ALTER TABLE detalles_orden ENABLE TRIGGER trg_check_orden_before_insert_update;');
+            await centralClient.query('ALTER TABLE detalles_orden ENABLE TRIGGER trg_check_orden_before_insert;');
         } catch (enableErr) {
             console.error('Error al reactivar el trigger después de un fallo:', enableErr);
         }

@@ -1,10 +1,8 @@
-version: '3.8'
-
 services:
   # Nodo 1: Quito (Principal)
   # Se ejecuta en el puerto 5433 de tu máquina local
   nodo-quito:
-    image: postgres:14-alpine
+    image: postgres
     container_name: taller_quito_db
     environment:
       POSTGRES_USER: taller_user
@@ -13,19 +11,14 @@ services:
     ports:
       - "5434:5432"
     volumes:
-      - ./postgres-data/quito:/var/lib/postgresql/data
-      - ./init-db:/docker-entrypoint-initdb.d
+      # Monta únicamente los scripts de inicialización para Quito
+      - ./init-db/quito:/docker-entrypoint-initdb.d
     restart: always
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U taller_user -d taller_db"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   # Nodo 2: Guayaquil
   # Se ejecuta en el puerto 5434 de tu máquina local
   nodo-guayaquil:
-    image: postgres:14-alpine
+    image: postgres
     container_name: taller_guayaquil_db
     environment:
       POSTGRES_USER: taller_user
@@ -34,19 +27,14 @@ services:
     ports:
       - "5435:5432"
     volumes:
-      - ./postgres-data/guayaquil:/var/lib/postgresql/data
-      - ./init-db:/docker-entrypoint-initdb.d
+      # Monta únicamente los scripts de inicialización para Guayaquil
+      - ./init-db/guayaquil:/docker-entrypoint-initdb.d
     restart: always
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U taller_user -d taller_db"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   # Nodo 3: Cuenca
   # Se ejecuta en el puerto 5435 de tu máquina local
   nodo-cuenca:
-    image: postgres:14-alpine
+    image: postgres
     container_name: taller_cuenca_db
     environment:
       POSTGRES_USER: taller_user
@@ -55,14 +43,7 @@ services:
     ports:
       - "5436:5432"
     volumes:
-      - ./postgres-data/cuenca:/var/lib/postgresql/data
-      - ./init-db:/docker-entrypoint-initdb.d
+      # Monta únicamente los scripts de inicialización para Cuenca
+      - ./init-db/cuenca:/docker-entrypoint-initdb.d
     restart: always
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U taller_user -d taller_db"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
-volumes:
-  postgres-data:
