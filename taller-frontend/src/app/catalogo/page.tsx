@@ -36,9 +36,9 @@ export default function CatalogoPage() {
       try {
         const [sRes, cRes, tRes, pRes] = await Promise.all([
           fetch('http://localhost:5000/api/servicios'),
-fetch('http://localhost:5000/api/ciudades'),
-fetch('http://localhost:5000/api/tipos-vehiculo'),
-fetch('http://localhost:5000/api/productos')
+          fetch('http://localhost:5000/api/ciudades'),
+          fetch('http://localhost:5000/api/tipos-vehiculo'),
+          fetch('http://localhost:5000/api/productos')
 
         ])
 
@@ -62,7 +62,7 @@ fetch('http://localhost:5000/api/productos')
   }, [])
 
   return (
-    <div className="space-y-8 p-6">
+    <div className="space-y-10 p-6 bg-gray-50 min-h-screen">
       <h2 className="text-3xl font-bold text-[#001A30]">Catálogo</h2>
 
       {[
@@ -73,14 +73,19 @@ fetch('http://localhost:5000/api/productos')
           rows: (s: Servicio) => [
             s.servicio_id,
             s.nombre,
-            `$${Number(s.precio).toFixed(2)}`
+            <span className="text-green-700 font-semibold">${Number(s.precio).toFixed(2)}</span>
           ],
         },
         {
           title: 'Ciudades',
           data: ciudades,
           columns: ['ID', 'Nombre'],
-          rows: (c: Ciudad) => [c.ciudad_id, c.nombre],
+          rows: (c: Ciudad) => [
+            c.ciudad_id,
+            <span className="px-2 py-1 text-xs rounded bg-gray-300 text-gray-800 font-semibold">
+              {c.nombre}
+            </span>
+          ],
         },
         {
           title: 'Tipos de Vehículo',
@@ -95,14 +100,16 @@ fetch('http://localhost:5000/api/productos')
           rows: (p: Producto) => [
             p.producto_id,
             p.nombre,
-            `$${Number(p.precio).toFixed(2)}`,
-            p.stock
+            <span className="text-green-700 font-semibold">${Number(p.precio).toFixed(2)}</span>,
+            <span className={`font-semibold ${p.stock > 10 ? 'text-green-600' : 'text-red-600'}`}>
+              {p.stock}
+            </span>
           ],
         },
       ].map((section, idx) => (
-        <div key={idx}>
-          <h3 className="text-xl font-semibold text-[#001A30] mb-2">{section.title}</h3>
-          <div className="overflow-x-auto rounded-lg shadow bg-white">
+        <div key={idx} className="bg-white shadow-md rounded-lg p-5">
+          <h3 className="text-xl font-semibold text-[#001A30] mb-4 border-b pb-2">{section.title}</h3>
+          <div className="overflow-x-auto">
             <table className="min-w-full text-sm">
               <thead className="bg-blue-100 text-blue-900 font-medium">
                 <tr>
@@ -114,7 +121,7 @@ fetch('http://localhost:5000/api/productos')
               <tbody>
                 {section.data.map((item: any, i: number) => (
                   <tr key={i} className="border-b hover:bg-gray-50">
-                    {section.rows(item).map((cell: string | number, j: number) => (
+                    {section.rows(item).map((cell: any, j: number) => (
                       <td key={j} className="p-3 text-[#1a1a1a]">{cell}</td>
                     ))}
                   </tr>

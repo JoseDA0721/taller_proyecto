@@ -129,7 +129,11 @@ const [mostrarFormulario, setMostrarFormulario] = useState(false)
             <td className="p-3 text-[#001A30]">{orden.placa}</td>
             <td className="p-3 text-[#001A30]">{new Date(orden.fecha).toLocaleDateString()}</td>
             <td className="p-3 text-[#001A30]">{orden.estado}</td>
-            <td className="p-3 text-[#001A30]">{getNombreCiudad(orden.ciudad_id)}</td>
+            <td className="p-3">
+              <span className="px-2 py-1 text-xs rounded bg-gray-300 text-gray-800 font-semibold">
+                {getNombreCiudad(orden.ciudad_id)}
+              </span>
+            </td>
             <td className="p-3 text-[#001A30]">{orden.empleado_cedula}</td>
             <td className="p-3 text-[#001A30]">{getNombrePago(orden.form_pago_id)}</td>
             <td className="p-3 text-[#001A30]">${orden.total}</td>
@@ -162,25 +166,40 @@ const getNombrePago = (id: number) => {
     <div className="space-y-6">
       <h2 className="text-3xl font-bold text-[#001A30]">Órdenes de Compra</h2>
       <div className="overflow-x-auto rounded-lg shadow bg-white">
-        <div className="flex gap-3 mb-4">
+        <div className="flex flex-wrap gap-3 mb-4 items-center">
           <input
             type="text"
             placeholder="ID"
             value={busquedaId}
             onChange={(e) => setBusquedaId(e.target.value)}
-            className="border p-2 rounded text-sm"
+            className="border border-gray-300 p-2 rounded text-sm text-gray-900 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
           <input
             type="text"
             placeholder="Cédula"
             value={busquedaCedula}
             onChange={(e) => setBusquedaCedula(e.target.value)}
-            className="border p-2 rounded text-sm"
+            className="border border-gray-300 p-2 rounded text-sm text-gray-900 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
-          <button onClick={getOrdenById} className="bg-gray-200 px-3 py-1 rounded">Buscar por ID</button>
-          <button onClick={getOrdenesByCedula} className="bg-gray-200 px-3 py-1 rounded">Buscar por Cédula</button>
+          <button
+            onClick={getOrdenById}
+            className="bg-gray-300 hover:bg-gray-400 text-[#001A30] px-4 py-2 rounded font-medium transition"
+          >
+            Buscar por ID
+          </button>
+          <button
+            onClick={getOrdenesByCedula}
+            className="bg-gray-300 hover:bg-gray-400 text-[#001A30] px-4 py-2 rounded font-medium transition"
+          >
+            Buscar por Cédula
+          </button>
           <CrearOrdenModal onSuccess={() => window.location.reload()} />
-          <button onClick={actualizarOrden} className="bg-blue-500 text-white px-3 py-1 rounded">Actualizar Orden</button>
+          <button
+            onClick={actualizarOrden}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-semibold transition"
+          >
+            Actualizar Orden
+          </button>
         </div>
 
     {mostrarFormulario && (
