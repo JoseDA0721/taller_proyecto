@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+import CrearOrdenModal from './CrearOrdenModal' // ajusta la ruta si tu carpeta se llama diferente
 
 interface Orden {
   orden_id: string
@@ -19,6 +20,20 @@ export default function OrdenesPage() {
   const [resultadoBusqueda, setResultadoBusqueda] = useState<Orden | Orden[] | null>(null)
   const [busquedaId, setBusquedaId] = useState('')
   const [busquedaCedula, setBusquedaCedula] = useState('')
+
+  const [nuevaOrden, setNuevaOrden] = useState({
+  cliente_cedula: '',
+  placa: '',
+  fecha: new Date().toISOString().slice(0, 10),
+  estado: 'En Proceso',
+  ciudad_id: 3,
+  empleado_cedula: '',
+  form_pago_id: 1,
+  total: 0
+})
+
+const [mostrarFormulario, setMostrarFormulario] = useState(false)
+
 
   const getOrdenById = async () => {
     try {
@@ -43,28 +58,24 @@ export default function OrdenesPage() {
   }
 
   const crearOrden = async () => {
-    try {
-      const nuevaOrden = {
-        fecha: new Date().toISOString(),
-        total: 150.0,
-        estado: 'En Proceso',
-        cliente_cedula: '0102030405',
-        ciudad_id: 3,
-        placa: 'ABA-9999',
-        empleado_cedula: '0100000001',
-        form_pago_id: 1,
-      }
-      const res = await fetch('http://localhost:5000/api/orden', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(nuevaOrden),
-      })
-      const data = await res.json()
-      console.log('Orden creada:', data)
-    } catch (error) {
-      console.error('Error al crear orden:', error)
-    }
+  try {
+    const res = await fetch('http://localhost:5000/api/orden', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(nuevaOrden)
+    })
+    const data = await res.json()
+    console.log('Orden creada:', data)
+    setMostrarFormulario(false)
+    // Recargar lista
+    const updated = await fetch('http://localhost:5000/api/ordenes')
+    const ordenesActualizadas = await updated.json()
+    setOrdenes(Array.isArray(ordenesActualizadas) ? ordenesActualizadas : [])
+  } catch (error) {
+    console.error('Error al crear orden:', error)
   }
+}
+
 
   const actualizarOrden = async () => {
     try {
@@ -118,15 +129,34 @@ export default function OrdenesPage() {
             <td className="p-3 text-[#001A30]">{orden.placa}</td>
             <td className="p-3 text-[#001A30]">{new Date(orden.fecha).toLocaleDateString()}</td>
             <td className="p-3 text-[#001A30]">{orden.estado}</td>
-            <td className="p-3 text-[#001A30]">{orden.ciudad_id}</td>
+            <td className="p-3 text-[#001A30]">{getNombreCiudad(orden.ciudad_id)}</td>
             <td className="p-3 text-[#001A30]">{orden.empleado_cedula}</td>
-            <td className="p-3 text-[#001A30]">{orden.form_pago_id}</td>
+            <td className="p-3 text-[#001A30]">{getNombrePago(orden.form_pago_id)}</td>
             <td className="p-3 text-[#001A30]">${orden.total}</td>
           </tr>
         ))}
       </tbody>
     </table>
   )
+
+  const getNombreCiudad = (id: number) => {
+  switch (id) {
+    case 1: return 'Quito'
+    case 2: return 'Guayaquil'
+    case 3: return 'Cuenca'
+    default: return 'Desconocida'
+  }
+}
+
+const getNombrePago = (id: number) => {
+  switch (id) {
+    case 1: return 'Efectivo'
+    case 2: return 'Crédito'
+    case 3: return 'Transferencia'
+    default: return 'Otro'
+  }
+}
+
 
   return (
     <div className="space-y-6">
@@ -149,9 +179,65 @@ export default function OrdenesPage() {
           />
           <button onClick={getOrdenById} className="bg-gray-200 px-3 py-1 rounded">Buscar por ID</button>
           <button onClick={getOrdenesByCedula} className="bg-gray-200 px-3 py-1 rounded">Buscar por Cédula</button>
-          <button onClick={crearOrden} className="bg-green-500 text-white px-3 py-1 rounded">Crear Orden</button>
+          <CrearOrdenModal onSuccess={() => window.location.reload()} />
           <button onClick={actualizarOrden} className="bg-blue-500 text-white px-3 py-1 rounded">Actualizar Orden</button>
         </div>
+
+    {mostrarFormulario && (
+  <div className="bg-gray-50 border rounded p-4 mt-4 space-y-3">
+    <h3 className="text-lg font-semibold">Nueva Orden</h3>
+    <div className="grid grid-cols-2 gap-4">
+      <input type="text" placeholder="Cédula del Cliente"
+        value={nuevaOrden.cliente_cedula}
+        onChange={(e) => setNuevaOrden({ ...nuevaOrden, cliente_cedula: e.target.value })}
+        className="border p-2 rounded" />
+      
+      <input type="text" placeholder="Placa"
+        value={nuevaOrden.placa}
+        onChange={(e) => setNuevaOrden({ ...nuevaOrden, placa: e.target.value })}
+        className="border p-2 rounded" />
+
+      <input type="date" placeholder="Fecha"
+        value={nuevaOrden.fecha}
+        onChange={(e) => setNuevaOrden({ ...nuevaOrden, fecha: e.target.value })}
+        className="border p-2 rounded" />
+
+      <select value={nuevaOrden.estado}
+        onChange={(e) => setNuevaOrden({ ...nuevaOrden, estado: e.target.value })}
+        className="border p-2 rounded">
+        <option value="En Proceso">En Proceso</option>
+        <option value="Finalizada">Finalizada</option>
+        <option value="Recibida">Recibida</option>
+      </select>
+
+      <input type="number" placeholder="Ciudad ID"
+        value={nuevaOrden.ciudad_id}
+        onChange={(e) => setNuevaOrden({ ...nuevaOrden, ciudad_id: Number(e.target.value) })}
+        className="border p-2 rounded" />
+
+      <input type="text" placeholder="Cédula del Empleado"
+        value={nuevaOrden.empleado_cedula}
+        onChange={(e) => setNuevaOrden({ ...nuevaOrden, empleado_cedula: e.target.value })}
+        className="border p-2 rounded" />
+
+      <input type="number" placeholder="Forma de Pago ID"
+        value={nuevaOrden.form_pago_id}
+        onChange={(e) => setNuevaOrden({ ...nuevaOrden, form_pago_id: Number(e.target.value) })}
+        className="border p-2 rounded" />
+
+      <input type="number" placeholder="Total ($)"
+        value={nuevaOrden.total}
+        onChange={(e) => setNuevaOrden({ ...nuevaOrden, total: Number(e.target.value) })}
+        className="border p-2 rounded" />
+    </div>
+
+    <div className="flex gap-3 mt-4">
+      <button onClick={crearOrden} className="bg-green-600 text-white px-4 py-1 rounded">Guardar</button>
+      <button onClick={() => setMostrarFormulario(false)} className="bg-red-500 text-white px-4 py-1 rounded">Cancelar</button>
+    </div>
+  </div>
+)}
+
 
         {resultadoBusqueda && (
           <div className="mt-6">
