@@ -30,3 +30,33 @@ export async function createCliente(cliente: any) {
     return { success: false, message: 'Error de conexión' };
   }
 }
+
+export async function deleteCliente(cedula: string) {
+  try {
+    const res = await fetch(`http://localhost:5000/api/cliente/${cedula}`, {
+      method: 'DELETE',
+    });
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.message || 'Error al eliminar cliente');
+    return { success: true };
+  } catch (error) {
+    return { success: false, message: (error as Error).message };
+  }
+}
+
+export async function updateCliente(cedula: string, cliente: any) {
+  try {
+    const res = await fetch(`http://localhost:5000/api/cliente/${cedula}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(cliente),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Error al actualizar cliente');
+    return { success: true };
+  } catch (error) {
+    return { success: false, message: (error as Error).message };
+  }
+}

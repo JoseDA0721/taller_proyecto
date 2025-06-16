@@ -7,22 +7,23 @@ import { FaTimes } from 'react-icons/fa';
 interface Props {
   onClose: () => void;
   onCreated: () => void;
+   ciudadIdSeleccionada: number
 }
 
-export default function ClienteFormModal({ onClose, onCreated }: Props) {
+export default function ClienteFormModal({ onClose, onCreated, ciudadIdSeleccionada }: Props) {
   const [form, setForm] = useState({
     cedula: '',
     nombre: '',
     telefono: '',
     correo: '',
-    ciudad_id: 1,
+    ciudad_id: ciudadIdSeleccionada,
   });
 
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm({ ...form, [e.target.name]: e.target.name === 'ciudad_id' ? Number(e.target.value) : e.target.value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -61,7 +62,7 @@ export default function ClienteFormModal({ onClose, onCreated }: Props) {
             type="text"
             name="cedula"
             placeholder="Cédula"
-            className="w-full border rounded p-2"
+            className="w-full border rounded p-2 text-gray-900"
             value={form.cedula}
             onChange={handleChange}
           />
@@ -69,7 +70,7 @@ export default function ClienteFormModal({ onClose, onCreated }: Props) {
             type="text"
             name="nombre"
             placeholder="Nombre"
-            className="w-full border rounded p-2"
+            className="w-full border rounded p-2 text-gray-900"
             value={form.nombre}
             onChange={handleChange}
           />
@@ -77,7 +78,7 @@ export default function ClienteFormModal({ onClose, onCreated }: Props) {
             type="text"
             name="telefono"
             placeholder="Teléfono"
-            className="w-full border rounded p-2"
+            className="w-full border rounded p-2 text-gray-900"
             value={form.telefono}
             onChange={handleChange}
           />
@@ -85,7 +86,7 @@ export default function ClienteFormModal({ onClose, onCreated }: Props) {
             type="email"
             name="correo"
             placeholder="Correo"
-            className="w-full border rounded p-2"
+            className="w-full border rounded p-2 text-gray-900"
             value={form.correo}
             onChange={handleChange}
           />
@@ -93,7 +94,7 @@ export default function ClienteFormModal({ onClose, onCreated }: Props) {
             name="ciudad_id"
             value={form.ciudad_id}
             onChange={handleChange}
-            className="w-full border rounded p-2"
+            className="w-full border rounded p-2 text-gray-900"
           >
             <option value={1}>Quito</option>
             <option value={2}>Guayaquil</option>
@@ -108,6 +109,7 @@ export default function ClienteFormModal({ onClose, onCreated }: Props) {
             {loading ? 'Guardando...' : 'Guardar'}
           </button>
         </form>
+
       </div>
     </div>
   );
