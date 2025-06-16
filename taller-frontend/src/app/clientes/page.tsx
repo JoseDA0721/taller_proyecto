@@ -126,7 +126,7 @@ const actualizarCliente = async () => {
     placeholder="Buscar por cédula"
     value={busquedaCedula}
     onChange={(e) => setBusquedaCedula(e.target.value)}
-    className="border p-2 rounded text-sm"
+    className="border border-gray-300 p-2 rounded text-sm text-gray-900 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
   />
   <button
     onClick={buscarClientePorCedula}
@@ -136,8 +136,8 @@ const actualizarCliente = async () => {
   </button>
 </div>
 {clienteBuscado && (
-  <div className="border rounded p-4 bg-gray-50 mt-2 space-y-3">
-    <h3 className="font-bold text-[#001A30]">Editar Cliente</h3>
+  <div className="border rounded p-4 bg-gray-100 mt-2 space-y-3 shadow-md">
+    <h3 className="font-bold text-[#001A30] mb-2">Editar Cliente</h3>
     <input
       type="text"
       value={clienteBuscado.nombre}
@@ -145,7 +145,7 @@ const actualizarCliente = async () => {
         setClienteBuscado({ ...clienteBuscado, nombre: e.target.value })
       }
       placeholder="Nombre"
-      className="border p-2 rounded w-full"
+      className="border border-gray-300 p-2 rounded w-full text-gray-900 bg-white"
     />
     <input
       type="text"
@@ -154,7 +154,7 @@ const actualizarCliente = async () => {
         setClienteBuscado({ ...clienteBuscado, telefono: e.target.value })
       }
       placeholder="Teléfono"
-      className="border p-2 rounded w-full"
+      className="border border-gray-300 p-2 rounded w-full text-gray-900 bg-white"
     />
     <input
       type="email"
@@ -163,11 +163,11 @@ const actualizarCliente = async () => {
         setClienteBuscado({ ...clienteBuscado, correo: e.target.value })
       }
       placeholder="Correo"
-      className="border p-2 rounded w-full"
+      className="border border-gray-300 p-2 rounded w-full text-gray-900 bg-white"
     />
     <button
       onClick={actualizarCliente}
-      className="bg-green-600 text-white px-4 py-2 rounded"
+      className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
     >
       Guardar Cambios
     </button>

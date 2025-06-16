@@ -136,7 +136,7 @@ const actualizarVehiculo = async () => {
     placeholder="Buscar por placa"
     value={placaBusqueda}
     onChange={(e) => setPlacaBusqueda(e.target.value)}
-    className="border p-2 rounded text-sm"
+    className="border border-gray-300 p-2 rounded text-sm text-gray-900 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
   />
   <button
     onClick={buscarVehiculoPorPlaca}
@@ -160,12 +160,12 @@ const actualizarVehiculo = async () => {
         </tr>
       </thead>
       <tbody>
-        <tr className="border-t">
-          <td className="p-2">{vehiculoBuscado.placa}</td>
-          <td className="p-2">{vehiculoBuscado.marca}</td>
-          <td className="p-2">{vehiculoBuscado.modelo}</td>
-          <td className="p-2">{vehiculoBuscado.tipo}</td>
-          <td className="p-2">{vehiculoBuscado.cliente_cedula}</td>
+        <tr className="border-t hover:bg-gray-50">
+          <td className="p-2 text-gray-900">{vehiculoBuscado.placa}</td>
+          <td className="p-2 text-gray-900">{vehiculoBuscado.marca}</td>
+          <td className="p-2 text-gray-900">{vehiculoBuscado.modelo}</td>
+          <td className="p-2 text-gray-900">{vehiculoBuscado.tipo}</td>
+          <td className="p-2 text-gray-900">{vehiculoBuscado.cliente_cedula}</td>
           <td className="p-2">
             <button
               className="text-green-600 hover:text-green-800"
@@ -178,6 +178,7 @@ const actualizarVehiculo = async () => {
       </tbody>
     </table>
   </div>
+
 )}
 
 

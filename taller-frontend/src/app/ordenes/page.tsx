@@ -167,7 +167,7 @@ const handleEstadoChange = async (ordenId: string, nuevoEstado: string) => {
   <select
     value={orden.estado}
     onChange={(e) => estadoChangeHandler(orden.orden_id, e.target.value)}
-    className="border border-gray-300 rounded px-2 py-1 text-sm"
+    className="border border-black rounded px-2 py-1 text-sm text-black bg-white"
   >
     <option value="En Proceso">En Proceso</option>
     <option value="Finalizada">Finalizada</option>
@@ -243,57 +243,83 @@ const getNombrePago = (id: number) => {
 
         </div>
 
-    {mostrarFormulario && (
-  <div className="bg-gray-50 border rounded p-4 mt-4 space-y-3">
-    <h3 className="text-lg font-semibold">Nueva Orden</h3>
+{mostrarFormulario && (
+  <div className="bg-white border border-gray-300 rounded-lg p-6 mt-4 shadow-md space-y-4">
+    <h3 className="text-xl font-bold text-blue-700">Nueva Orden</h3>
+
     <div className="grid grid-cols-2 gap-4">
-      <input type="text" placeholder="Cédula del Cliente"
+      <input
+        type="text"
+        placeholder="Cédula del Cliente"
         value={nuevaOrden.cliente_cedula}
         onChange={(e) => setNuevaOrden({ ...nuevaOrden, cliente_cedula: e.target.value })}
-        className="border p-2 rounded" />
-      
-      <input type="text" placeholder="Placa"
+        className="border border-black p-2 rounded text-black bg-white"
+      />
+      <input
+        type="text"
+        placeholder="Placa"
         value={nuevaOrden.placa}
         onChange={(e) => setNuevaOrden({ ...nuevaOrden, placa: e.target.value })}
-        className="border p-2 rounded" />
-
-      <input type="date" placeholder="Fecha"
+        className="border border-black p-2 rounded text-black bg-white"
+      />
+      <input
+        type="date"
         value={nuevaOrden.fecha}
         onChange={(e) => setNuevaOrden({ ...nuevaOrden, fecha: e.target.value })}
-        className="border p-2 rounded" />
-
-      <select value={nuevaOrden.estado}
+        className="border border-black p-2 rounded text-black bg-white"
+      />
+      <select
+        value={nuevaOrden.estado}
         onChange={(e) => setNuevaOrden({ ...nuevaOrden, estado: e.target.value })}
-        className="border p-2 rounded">
+        className="border border-black p-2 rounded text-black bg-white"
+      >
         <option value="En Proceso">En Proceso</option>
         <option value="Finalizada">Finalizada</option>
         <option value="Recibida">Recibida</option>
       </select>
-
-      <input type="number" placeholder="Ciudad ID"
+      <input
+        type="number"
+        placeholder="Ciudad ID"
         value={nuevaOrden.ciudad_id}
         onChange={(e) => setNuevaOrden({ ...nuevaOrden, ciudad_id: Number(e.target.value) })}
-        className="border p-2 rounded" />
-
-      <input type="text" placeholder="Cédula del Empleado"
+        className="border border-black p-2 rounded text-black bg-white"
+      />
+      <input
+        type="text"
+        placeholder="Cédula del Empleado"
         value={nuevaOrden.empleado_cedula}
         onChange={(e) => setNuevaOrden({ ...nuevaOrden, empleado_cedula: e.target.value })}
-        className="border p-2 rounded" />
-
-      <input type="number" placeholder="Forma de Pago ID"
+        className="border border-black p-2 rounded text-black bg-white"
+      />
+      <input
+        type="number"
+        placeholder="Forma de Pago ID"
         value={nuevaOrden.form_pago_id}
         onChange={(e) => setNuevaOrden({ ...nuevaOrden, form_pago_id: Number(e.target.value) })}
-        className="border p-2 rounded" />
-
-      <input type="number" placeholder="Total ($)"
+        className="border border-black p-2 rounded text-black bg-white"
+      />
+      <input
+        type="number"
+        placeholder="Total ($)"
         value={nuevaOrden.total}
         onChange={(e) => setNuevaOrden({ ...nuevaOrden, total: Number(e.target.value) })}
-        className="border p-2 rounded" />
+        className="border border-black p-2 rounded text-black bg-white"
+      />
     </div>
 
-    <div className="flex gap-3 mt-4">
-      <button onClick={crearOrden} className="bg-green-600 text-white px-4 py-1 rounded">Guardar</button>
-      <button onClick={() => setMostrarFormulario(false)} className="bg-red-500 text-white px-4 py-1 rounded">Cancelar</button>
+    <div className="flex gap-3 mt-4 justify-end">
+      <button
+        onClick={crearOrden}
+        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition font-medium"
+      >
+        Guardar
+      </button>
+      <button
+        onClick={() => setMostrarFormulario(false)}
+        className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded transition font-medium"
+      >
+        Cancelar
+      </button>
     </div>
   </div>
 )}
