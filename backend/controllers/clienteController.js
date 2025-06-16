@@ -23,6 +23,7 @@ exports.getAllClientes = async (req, res) => {
         }
         res.status(200).json(result.rows);
     } catch (err) {
+        console.error('Error getAllClientes:', err); // 👈 agrega esto
         res.status(500).json({ error: 'Error interno del servidor', details: err.message });
     }
 };
@@ -74,7 +75,7 @@ exports.createCliente = async (req, res) => {
     const pool = getPoolByCity(ciudad_id);
     if (!pool) return res.status(400).json({ message: 'ID de ciudad no válido.' });
     
-    // Nombres de las tablas fragmentadas dinámicamente
+    // Nombres de las tablas fragmentaaadas dinámicamente
     const suffix = ciudad_id === 1 ? 'quito' : ciudad_id === 2 ? 'guayaquil' : 'cuenca';
     
     const client = await pool.connect();
@@ -93,6 +94,7 @@ exports.createCliente = async (req, res) => {
         res.status(201).json({ message: `Cliente creado exitosamente en ${suffix}.`, data: req.body });
     } catch (err) {
         await client.query('ROLLBACK');
+        console.error('ERROR AL CREAR CLIENTE:', err); // 👈 AÑADE ESTO
         res.status(500).json({ error: err.message });
     } finally {
         client.release();

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa'
+import VehiculoFormModal from '@/components/VehiculoFormModal'
 
 interface Vehiculo {
   placa: string
@@ -13,7 +14,7 @@ interface Vehiculo {
 
 export default function VehiculosPage() {
   const [vehiculos, setVehiculos] = useState<Vehiculo[]>([])
-
+  const [showModal, setShowModal] = useState(false)
   useEffect(() => {
     async function fetchData() {
       try {
@@ -37,10 +38,14 @@ export default function VehiculosPage() {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="text-3xl font-bold text-[#001A30]">Listado de Vehículos (Global)</h2>
-        <button className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
-          <FaPlus />
-          Nuevo Vehículo
-        </button>
+        <button
+  className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+  onClick={() => setShowModal(true)}
+>
+  <FaPlus />
+  Nuevo Vehículo
+</button>
+
       </div>
 
       <div className="overflow-x-auto rounded-lg shadow bg-white">
@@ -75,6 +80,16 @@ export default function VehiculosPage() {
             ))}
           </tbody>
         </table>
+        {showModal && (
+  <VehiculoFormModal
+    onClose={() => setShowModal(false)}
+    onCreated={() => {
+      setShowModal(false)
+      window.location.reload() // O puedes volver a llamar al fetch
+    }}
+  />
+)}
+
       </div>
     </div>
   )

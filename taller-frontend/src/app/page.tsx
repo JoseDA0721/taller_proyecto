@@ -15,6 +15,14 @@ export default function Home() {
     fetchDashboardStats().then(setStats)
   }, [])
 
+  const [fechaSync, setFechaSync] = useState('')
+
+useEffect(() => {
+  fetchDashboardStats().then(setStats)
+  setFechaSync(new Date().toLocaleString())
+}, [])
+
+
   return (
     <div
       className="min-h-screen bg-gray-100 bg-cover bg-center flex flex-col justify-start items-center pt-12 px-6 pb-10"
@@ -54,7 +62,7 @@ export default function Home() {
         <div className="bg-white rounded-lg shadow p-6 w-full mt-6">
           <h2 className="text-xl font-semibold text-gray-800 mb-3">Estado del sistema</h2>
           <p className="text-gray-700 flex items-center gap-2 mb-1">
-            ⏰ Última sincronización: <strong>{new Date().toLocaleString()}</strong>
+            ⏰ Última sincronización: <strong>{fechaSync}</strong>
           </p>
           <p className="text-gray-700 flex items-center gap-2">
             🌐 Nodo activo: <strong>Guayaquil</strong>

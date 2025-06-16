@@ -7,22 +7,23 @@ import { FaTimes } from 'react-icons/fa';
 interface Props {
   onClose: () => void;
   onCreated: () => void;
+   ciudadIdSeleccionada: number
 }
 
-export default function ClienteFormModal({ onClose, onCreated }: Props) {
+export default function ClienteFormModal({ onClose, onCreated, ciudadIdSeleccionada }: Props) {
   const [form, setForm] = useState({
     cedula: '',
     nombre: '',
     telefono: '',
     correo: '',
-    ciudad_id: 1,
+    ciudad_id: ciudadIdSeleccionada,
   });
 
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm({ ...form, [e.target.name]: e.target.name === 'ciudad_id' ? Number(e.target.value) : e.target.value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

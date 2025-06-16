@@ -107,6 +107,9 @@ export default function ClientesPage() {
       {/* Modal de creación */}
       {showModal && (
         <ClienteFormModal
+        ciudadIdSeleccionada={
+    ciudades.find((c) => c.nombre.toLowerCase() === ciudad)?.id || 1
+  }
           onClose={() => setShowModal(false)}
           onCreated={() => getClientes(ciudad).then(setClientes)}
         />
