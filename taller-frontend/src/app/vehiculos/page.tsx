@@ -83,10 +83,22 @@ export default function VehiculosPage() {
         {showModal && (
   <VehiculoFormModal
     onClose={() => setShowModal(false)}
-    onCreated={() => {
-      setShowModal(false)
-      window.location.reload() // O puedes volver a llamar al fetch
-    }}
+    onCreated={async () => {
+  setShowModal(false)
+  try {
+    const res = await fetch('http://localhost:5000/api/vehiculos')
+    const data = await res.json()
+    if (Array.isArray(data)) {
+      setVehiculos(data)
+    } else {
+      setVehiculos([])
+    }
+  } catch (error) {
+    console.error('Error al refrescar vehículos:', error)
+    setVehiculos([])
+  }
+}}
+ ciudadIdSeleccionada={1} // ✅ añade esta línea
   />
 )}
 

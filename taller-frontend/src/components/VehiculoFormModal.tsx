@@ -6,33 +6,50 @@ import { FaTimes } from 'react-icons/fa'
 interface Props {
   onClose: () => void
   onCreated: () => void
+  ciudadIdSeleccionada: number
 }
 
-export default function VehiculoFormModal({ onClose, onCreated }: Props) {
+const ciudades = [
+  { id: 1, nombre: 'Quito' },
+  { id: 2, nombre: 'Guayaquil' },
+  { id: 3, nombre: 'Cuenca' }
+]
+
+export default function VehiculoFormModal({ onClose, onCreated, ciudadIdSeleccionada }: Props) {
   const [form, setForm] = useState({
     placa: '',
     marca: '',
     modelo: '',
     tipo: '',
     cedula_dueno: '',
+    ciudad_id: ciudadIdSeleccionada,
   })
+
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target
+    setForm({ ...form, [name]: name === 'ciudad_id' ? Number(value) : value })
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setLoading(true)
 
+    const { placa, marca, modelo, tipo, cedula_dueno, ciudad_id } = form
+    if (!placa || !marca || !modelo || !tipo || !cedula_dueno || !ciudad_id) {
+      setError('Todos los campos son requeridos.')
+      return
+    }
+
+    setLoading(true)
     try {
-      const res = await fetch('http://localhost:5000/api/vehiculos', {
+      const res = await fetch('http://localhost:5000/api/vehiculo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       })
+
       const data = await res.json()
       if (res.ok) {
         onCreated()
@@ -63,6 +80,12 @@ export default function VehiculoFormModal({ onClose, onCreated }: Props) {
           <input name="modelo" placeholder="Modelo" className="w-full border p-2 rounded" value={form.modelo} onChange={handleChange} />
           <input name="tipo" placeholder="Tipo" className="w-full border p-2 rounded" value={form.tipo} onChange={handleChange} />
           <input name="cedula_dueno" placeholder="Cédula del Dueño" className="w-full border p-2 rounded" value={form.cedula_dueno} onChange={handleChange} />
+
+          <select name="ciudad_id" value={form.ciudad_id} onChange={handleChange} className="w-full border p-2 rounded">
+            {ciudades.map((c) => (
+              <option key={c.id} value={c.id}>{c.nombre}</option>
+            ))}
+          </select>
 
           <button type="submit" disabled={loading} className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition">
             {loading ? 'Guardando...' : 'Guardar'}

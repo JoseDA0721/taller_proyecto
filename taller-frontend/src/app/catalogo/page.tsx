@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react'
 interface Servicio {
   servicio_id: number
   nombre: string
-  precio: number
+  precio: number | string
 }
 
 interface Ciudad {
@@ -21,7 +21,7 @@ interface TipoVehiculo {
 interface Producto {
   producto_id: number
   nombre: string
-  precio: number
+  precio: number | string
   stock: number
 }
 
@@ -35,10 +35,11 @@ export default function CatalogoPage() {
     const fetchAll = async () => {
       try {
         const [sRes, cRes, tRes, pRes] = await Promise.all([
-          fetch('http://localhost:5000/api/catalogos/servicios'),
-          fetch('http://localhost:5000/api/catalogos/ciudades'),
-          fetch('http://localhost:5000/api/catalogos/tipos-vehiculo'),
-          fetch('http://localhost:5000/api/catalogos/productos')
+          fetch('http://localhost:5000/api/servicios'),
+fetch('http://localhost:5000/api/ciudades'),
+fetch('http://localhost:5000/api/tipos-vehiculo'),
+fetch('http://localhost:5000/api/productos')
+
         ])
 
         const [sData, cData, tData, pData] = await Promise.all([
@@ -61,106 +62,68 @@ export default function CatalogoPage() {
   }, [])
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 p-6">
       <h2 className="text-3xl font-bold text-[#001A30]">Catálogo</h2>
 
-      {/* Servicios */}
-      <div>
-        <h3 className="text-xl font-semibold text-[#001A30] mb-2">Servicios</h3>
-        <div className="overflow-x-auto rounded-lg shadow bg-white">
-          <table className="min-w-full text-sm">
-            <thead className="bg-blue-100 text-blue-800">
-              <tr>
-                <th className="p-3 text-left">ID</th>
-                <th className="p-3 text-left">Nombre</th>
-                <th className="p-3 text-left">Precio</th>
-              </tr>
-            </thead>
-            <tbody>
-              {servicios.map((s) => (
-                <tr key={s.servicio_id} className="border-b hover:bg-gray-50">
-                  <td className="p-3 text-gray-900">{s.servicio_id}</td>
-                  <td className="p-3 text-gray-900">{s.nombre}</td>
-                  <td className="p-3 text-gray-900">${s.precio.toFixed(2)}</td>
+      {[
+        {
+          title: 'Servicios',
+          data: servicios,
+          columns: ['ID', 'Nombre', 'Precio'],
+          rows: (s: Servicio) => [
+            s.servicio_id,
+            s.nombre,
+            `$${Number(s.precio).toFixed(2)}`
+          ],
+        },
+        {
+          title: 'Ciudades',
+          data: ciudades,
+          columns: ['ID', 'Nombre'],
+          rows: (c: Ciudad) => [c.ciudad_id, c.nombre],
+        },
+        {
+          title: 'Tipos de Vehículo',
+          data: tipos,
+          columns: ['ID', 'Nombre'],
+          rows: (t: TipoVehiculo) => [t.tipo_id, t.nombre],
+        },
+        {
+          title: 'Productos',
+          data: productos,
+          columns: ['ID', 'Nombre', 'Precio', 'Stock'],
+          rows: (p: Producto) => [
+            p.producto_id,
+            p.nombre,
+            `$${Number(p.precio).toFixed(2)}`,
+            p.stock
+          ],
+        },
+      ].map((section, idx) => (
+        <div key={idx}>
+          <h3 className="text-xl font-semibold text-[#001A30] mb-2">{section.title}</h3>
+          <div className="overflow-x-auto rounded-lg shadow bg-white">
+            <table className="min-w-full text-sm">
+              <thead className="bg-blue-100 text-blue-900 font-medium">
+                <tr>
+                  {section.columns.map((col, i) => (
+                    <th key={i} className="p-3 text-left">{col}</th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {section.data.map((item: any, i: number) => (
+                  <tr key={i} className="border-b hover:bg-gray-50">
+                    {section.rows(item).map((cell: string | number, j: number) => (
+                      <td key={j} className="p-3 text-[#1a1a1a]">{cell}</td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
-
-      {/* Ciudades */}
-      <div>
-        <h3 className="text-xl font-semibold text-[#001A30] mb-2">Ciudades</h3>
-        <div className="overflow-x-auto rounded-lg shadow bg-white">
-          <table className="min-w-full text-sm">
-            <thead className="bg-blue-100 text-blue-800">
-              <tr>
-                <th className="p-3 text-left">ID</th>
-                <th className="p-3 text-left">Nombre</th>
-              </tr>
-            </thead>
-            <tbody>
-              {ciudades.map((c) => (
-                <tr key={c.ciudad_id} className="border-b hover:bg-gray-50">
-                  <td className="p-3 text-gray-900">{c.ciudad_id}</td>
-                  <td className="p-3 text-gray-900">{c.nombre}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Tipos de Vehículo */}
-      <div>
-        <h3 className="text-xl font-semibold text-[#001A30] mb-2">Tipos de Vehículo</h3>
-        <div className="overflow-x-auto rounded-lg shadow bg-white">
-          <table className="min-w-full text-sm">
-            <thead className="bg-blue-100 text-blue-800">
-              <tr>
-                <th className="p-3 text-left">ID</th>
-                <th className="p-3 text-left">Nombre</th>
-              </tr>
-            </thead>
-            <tbody>
-              {tipos.map((t) => (
-                <tr key={t.tipo_id} className="border-b hover:bg-gray-50">
-                  <td className="p-3 text-gray-900">{t.tipo_id}</td>
-                  <td className="p-3 text-gray-900">{t.nombre}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Productos */}
-      <div>
-        <h3 className="text-xl font-semibold text-[#001A30] mb-2">Productos</h3>
-        <div className="overflow-x-auto rounded-lg shadow bg-white">
-          <table className="min-w-full text-sm">
-            <thead className="bg-blue-100 text-blue-800">
-              <tr>
-                <th className="p-3 text-left">ID</th>
-                <th className="p-3 text-left">Nombre</th>
-                <th className="p-3 text-left">Precio</th>
-                <th className="p-3 text-left">Stock</th>
-              </tr>
-            </thead>
-            <tbody>
-              {productos.map((p) => (
-                <tr key={p.producto_id} className="border-b hover:bg-gray-50">
-                  <td className="p-3 text-gray-900">{p.producto_id}</td>
-                  <td className="p-3 text-gray-900">{p.nombre}</td>
-                  <td className="p-3 text-gray-900">${p.precio.toFixed(2)}</td>
-                  <td className="p-3 text-gray-900">{p.stock}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      ))}
     </div>
   )
 }
