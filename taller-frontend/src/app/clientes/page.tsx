@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react'
 import { getClientes } from '@/services/clienteService'
 import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa'
 import ClienteFormModal from '@/components/ClienteFormModal'
+import { deleteCliente } from '@/services/clienteService'
+
 
 interface Cliente {
   cedula: string
@@ -23,6 +25,20 @@ export default function ClientesPage() {
   const [showModal, setShowModal] = useState(false)
   const [clientes, setClientes] = useState<Cliente[]>([])
   const [ciudad, setCiudad] = useState<string | undefined>('quito')
+
+  const handleDelete = async (cedula: string) => {
+    const confirmed = window.confirm('¿Estás seguro de eliminar este cliente?');
+    if (!confirmed) return;
+
+    const result = await deleteCliente(cedula);
+    if (result.success) {
+      alert('Cliente eliminado correctamente');
+      const updated = await getClientes(ciudad);
+      setClientes(updated);
+    } else {
+      alert('Error al eliminar el cliente: ' + result.message);
+    }
+  };
 
   useEffect(() => {
     async function fetchData() {
@@ -94,7 +110,9 @@ export default function ClientesPage() {
                   <button className="text-blue-600 hover:text-blue-800" title="Editar">
                     <FaEdit />
                   </button>
-                  <button className="text-red-600 hover:text-red-800" title="Eliminar">
+                  <button className="text-red-600 hover:text-red-800"
+                    title="Eliminar"
+                    onClick={() => handleDelete(cliente.cedula)}>
                     <FaTrash />
                   </button>
                 </td>
