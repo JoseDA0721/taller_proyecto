@@ -29,3 +29,18 @@ export async function createVehiculo(vehiculo: any) {
     return { success: false, message: 'Error de conexión' };
   }
 }
+
+export async function deleteVehiculo(placa: string) {
+  try {
+    const res = await fetch(`http://localhost:5000/api/vehiculo/${placa}`, {
+      method: 'DELETE'
+    });
+    if (!res.ok) {
+      const error = await res.json();
+      return { success: false, message: error.message };
+    }
+    return { success: true };
+  } catch (error) {
+    return { success: false, message: 'Error de conexión' };
+  }
+}

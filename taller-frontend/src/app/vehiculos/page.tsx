@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from 'react'
 import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa'
 import VehiculoFormModal from '@/components/VehiculoFormModal'
+import { deleteVehiculo } from '@/services/vehiculoService';
+
 
 interface Vehiculo {
   placa: string
@@ -15,6 +17,19 @@ interface Vehiculo {
 export default function VehiculosPage() {
   const [vehiculos, setVehiculos] = useState<Vehiculo[]>([])
   const [showModal, setShowModal] = useState(false)
+  
+  const handleDelete = async (placa: string) => {
+    const confirmar = window.confirm('¿Estás seguro de eliminar este vehículo?');
+    if (!confirmar) return;
+
+    const result = await deleteVehiculo(placa);
+    if (result.success) {
+      setVehiculos(vehiculos.filter(v => v.placa !== placa));
+    } else {
+      alert(result.message || 'Error al eliminar vehículo');
+    }
+  };
+
   useEffect(() => {
     async function fetchData() {
       try {
@@ -72,7 +87,9 @@ export default function VehiculosPage() {
                   <button className="text-blue-600 hover:text-blue-800" title="Editar">
                     <FaEdit />
                   </button>
-                  <button className="text-red-600 hover:text-red-800" title="Eliminar">
+                  <button className="text-red-600 hover:text-red-800"
+                    title="Eliminar"
+                    onClick={() => handleDelete(vehiculo.placa)}>
                     <FaTrash />
                   </button>
                 </td>
@@ -98,7 +115,6 @@ export default function VehiculosPage() {
     setVehiculos([])
   }
 }}
- ciudadIdSeleccionada={1} // ✅ añade esta línea
   />
 )}
 

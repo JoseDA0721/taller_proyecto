@@ -132,26 +132,26 @@ export default function OrdenesPage() {
     <div className="space-y-6">
       <h2 className="text-3xl font-bold text-[#001A30]">Órdenes de Compra</h2>
       <div className="overflow-x-auto rounded-lg shadow bg-white">
-        <div className="flex gap-3 mb-4">
-          <input
-            type="text"
-            placeholder="ID"
-            value={busquedaId}
-            onChange={(e) => setBusquedaId(e.target.value)}
-            className="border p-2 rounded text-sm"
-          />
-          <input
-            type="text"
-            placeholder="Cédula"
-            value={busquedaCedula}
-            onChange={(e) => setBusquedaCedula(e.target.value)}
-            className="border p-2 rounded text-sm"
-          />
-          <button onClick={getOrdenById} className="bg-gray-200 px-3 py-1 rounded">Buscar por ID</button>
-          <button onClick={getOrdenesByCedula} className="bg-gray-200 px-3 py-1 rounded">Buscar por Cédula</button>
-          <button onClick={crearOrden} className="bg-green-500 text-white px-3 py-1 rounded">Crear Orden</button>
-          <button onClick={actualizarOrden} className="bg-blue-500 text-white px-3 py-1 rounded">Actualizar Orden</button>
-        </div>
+      <div className="flex gap-3 mb-4">
+        <input
+          type="text"
+          placeholder="ID"
+          value={busquedaId}
+          onChange={(e) => setBusquedaId(e.target.value)}
+          className="border p-2 rounded text-sm text-gray-900"
+        />
+        <input
+          type="text"
+          placeholder="Cédula"
+          value={busquedaCedula}
+          onChange={(e) => setBusquedaCedula(e.target.value)}
+          className="border p-2 rounded text-sm text-gray-900"
+        />
+        <button onClick={getOrdenById} className="bg-gray-300 text-gray-900 px-4 py-2 rounded hover:bg-gray-400 transition">Buscar por ID</button>
+        <button onClick={getOrdenesByCedula} className="bg-gray-300 text-gray-900 px-4 py-2 rounded hover:bg-gray-400 transition">Buscar por Cédula</button>
+        <button onClick={crearOrden} className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">Crear Orden</button>
+        <button onClick={actualizarOrden} className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">Actualizar Orden</button>
+      </div>
 
         {resultadoBusqueda && (
           <div className="mt-6">
