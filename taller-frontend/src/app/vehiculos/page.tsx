@@ -11,7 +11,7 @@ interface Vehiculo {
   marca: string
   modelo: string
   tipo: string
-  cedula_dueno: string
+  cliente_cedula: string
 }
 
 export default function VehiculosPage() {
@@ -33,18 +33,32 @@ export default function VehiculosPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await fetch('http://localhost:5000/api/vehiculos') // ✅ Quito por defecto
-        const data = await res.json()
-        console.log('Vehículos recibidos:', data)
-        if (Array.isArray(data)) {
-          setVehiculos(data)
-        } else {
-          setVehiculos([])
-        }
-      } catch (error) {
-        console.error('Error al obtener vehículos:', error)
-        setVehiculos([])
-      }
+  const res = await fetch('http://localhost:5000/api/vehiculos')
+  const data = await res.json()
+  console.log('Vehículos recibidos:', data)
+
+  if (Array.isArray(data)) {
+    const tipos = {
+      1: 'Sedán',
+      2: 'SUV',
+      3: 'Pickup'
+    }
+
+    const vehiculosTransformados = data.map((vehiculo: any) => ({
+  ...vehiculo,
+  tipo: tipos[vehiculo.tipo_id as keyof typeof tipos] || 'Desconocido'
+}))
+
+
+    setVehiculos(vehiculosTransformados)
+  } else {
+    setVehiculos([])
+  }
+} catch (error) {
+  console.error('Error al obtener vehículos:', error)
+  setVehiculos([])
+}
+
     }
     fetchData()
   }, [])
@@ -82,7 +96,7 @@ export default function VehiculosPage() {
                 <td className="p-3 text-gray-900">{vehiculo.marca}</td>
                 <td className="p-3 text-gray-900">{vehiculo.modelo}</td>
                 <td className="p-3 text-gray-900">{vehiculo.tipo}</td>
-                <td className="p-3 text-gray-900">{vehiculo.cedula_dueno}</td>
+                <td className="p-3 text-gray-900">{vehiculo.cliente_cedula}</td>
                 <td className="p-3 flex gap-2">
                   <button className="text-blue-600 hover:text-blue-800" title="Editar">
                     <FaEdit />
