@@ -54,11 +54,12 @@ exports.getClienteByCedula = async (req, res) => {
                                     ON t1.cedula = t2.cedula 
                                     JOIN 
                                     correo_clientes_${suffix} AS t3 
-                                    ON t2.cedula = t3.cedula;
+                                    ON t2.cedula = t3.cedula
+                                    WHERE t1.cedula = $1;
                                 `;
         console.log('query:', queryAllClientes);
         const client = await pool.connect();
-        const allCliente = await client.query(queryAllClientes);
+        const allCliente = await client.query(queryAllClientes, [cedula]);
         res.status(200).json(allCliente.rows[0]);
     } catch (err) {
         res.status(500).json({ error: err.message });

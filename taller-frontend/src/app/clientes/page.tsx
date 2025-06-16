@@ -135,6 +135,44 @@ const actualizarCliente = async () => {
     Buscar
   </button>
 </div>
+{clienteBuscado && (
+  <div className="border rounded p-4 bg-gray-50 mt-2 space-y-3">
+    <h3 className="font-bold text-[#001A30]">Editar Cliente</h3>
+    <input
+      type="text"
+      value={clienteBuscado.nombre}
+      onChange={(e) =>
+        setClienteBuscado({ ...clienteBuscado, nombre: e.target.value })
+      }
+      placeholder="Nombre"
+      className="border p-2 rounded w-full"
+    />
+    <input
+      type="text"
+      value={clienteBuscado.telefono}
+      onChange={(e) =>
+        setClienteBuscado({ ...clienteBuscado, telefono: e.target.value })
+      }
+      placeholder="Teléfono"
+      className="border p-2 rounded w-full"
+    />
+    <input
+      type="email"
+      value={clienteBuscado.correo}
+      onChange={(e) =>
+        setClienteBuscado({ ...clienteBuscado, correo: e.target.value })
+      }
+      placeholder="Correo"
+      className="border p-2 rounded w-full"
+    />
+    <button
+      onClick={actualizarCliente}
+      className="bg-green-600 text-white px-4 py-2 rounded"
+    >
+      Guardar Cambios
+    </button>
+  </div>
+)}
 
       <div className="overflow-x-auto rounded-lg shadow bg-white">
         <table className="min-w-full text-sm">
@@ -197,45 +235,6 @@ const actualizarCliente = async () => {
           onCreated={() => getClientes(ciudad).then(setClientes)}
         />
       )}
-
-      {clienteBuscado && (
-  <div className="border rounded p-4 bg-gray-50 mt-2 space-y-3">
-    <h3 className="font-bold text-[#001A30]">Editar Cliente</h3>
-    <input
-      type="text"
-      value={clienteBuscado.nombre}
-      onChange={(e) =>
-        setClienteBuscado({ ...clienteBuscado, nombre: e.target.value })
-      }
-      placeholder="Nombre"
-      className="border p-2 rounded w-full"
-    />
-    <input
-      type="text"
-      value={clienteBuscado.telefono}
-      onChange={(e) =>
-        setClienteBuscado({ ...clienteBuscado, telefono: e.target.value })
-      }
-      placeholder="Teléfono"
-      className="border p-2 rounded w-full"
-    />
-    <input
-      type="email"
-      value={clienteBuscado.correo}
-      onChange={(e) =>
-        setClienteBuscado({ ...clienteBuscado, correo: e.target.value })
-      }
-      placeholder="Correo"
-      className="border p-2 rounded w-full"
-    />
-    <button
-      onClick={actualizarCliente}
-      className="bg-green-600 text-white px-4 py-2 rounded"
-    >
-      Guardar Cambios
-    </button>
-  </div>
-)}
 
     </div>
   )

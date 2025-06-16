@@ -17,6 +17,10 @@ interface Vehiculo {
 export default function VehiculosPage() {
   const [vehiculos, setVehiculos] = useState<Vehiculo[]>([])
   const [showModal, setShowModal] = useState(false)
+  const [placaBusqueda, setPlacaBusqueda] = useState('');
+const [vehiculoBuscado, setVehiculoBuscado] = useState<Vehiculo | null>(null);
+const [editableVehiculo, setEditableVehiculo] = useState<Vehiculo | null>(null);
+
 
   const handleDelete = async (placa: string) => {
     const confirmar = window.confirm('¿Estás seguro de eliminar este vehículo?');
@@ -29,6 +33,56 @@ export default function VehiculosPage() {
       alert(result.message || 'Error al eliminar vehículo');
     }
   };
+
+  const buscarVehiculoPorPlaca = async () => {
+  try {
+    const res = await fetch(`http://localhost:5000/api/vehiculo/${placaBusqueda}`);
+    const data = await res.json();
+
+    if (Array.isArray(data) && data.length > 0) {
+      setVehiculoBuscado(data[0]); // ✅ accede al primer objeto del array
+    } else {
+      alert('Vehículo no encontrado');
+      setVehiculoBuscado(null);
+    }
+  } catch (error) {
+    console.error('Error al buscar vehículo:', error);
+    alert('No se pudo realizar la búsqueda');
+  }
+};
+
+
+const actualizarVehiculo = async () => {
+  if (!editableVehiculo) return;
+
+  try {
+    const tipo_id =
+      editableVehiculo.tipo.toLowerCase() === 'sedán'
+        ? 1
+        : editableVehiculo.tipo.toLowerCase() === 'suv'
+        ? 2
+        : 3;
+
+    const res = await fetch(`http://localhost:5000/api/vehiculo/${editableVehiculo.placa}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        marca: editableVehiculo.marca,
+        modelo: editableVehiculo.modelo,
+        tipo_id,
+      }),
+    });
+
+    if (!res.ok) throw new Error('Error al actualizar');
+    alert('Vehículo actualizado correctamente');
+    setEditableVehiculo(null);
+  } catch (error) {
+    console.error('Error actualizando vehículo:', error);
+    alert('No se pudo actualizar');
+  }
+};
+
+
 
   useEffect(() => {
     async function fetchData() {
@@ -76,8 +130,97 @@ export default function VehiculosPage() {
         </button>
 
       </div>
+<div className="mb-4 flex gap-2">
+  <input
+    type="text"
+    placeholder="Buscar por placa"
+    value={placaBusqueda}
+    onChange={(e) => setPlacaBusqueda(e.target.value)}
+    className="border p-2 rounded text-sm"
+  />
+  <button
+    onClick={buscarVehiculoPorPlaca}
+    className="bg-blue-600 text-white px-3 py-1 rounded"
+  >
+    Buscar
+  </button>
+</div>
+{vehiculoBuscado && (
+  <div className="border rounded p-4 bg-gray-50 mt-4 space-y-2">
+    <h3 className="font-bold text-[#001A30]">Resultado de búsqueda:</h3>
+    <table className="w-full text-sm border mt-2">
+      <thead className="bg-blue-100 text-blue-800">
+        <tr>
+          <th className="p-2">Placa</th>
+          <th className="p-2">Marca</th>
+          <th className="p-2">Modelo</th>
+          <th className="p-2">Tipo</th>
+          <th className="p-2">Cédula Dueño</th>
+          <th className="p-2">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr className="border-t">
+          <td className="p-2">{vehiculoBuscado.placa}</td>
+          <td className="p-2">{vehiculoBuscado.marca}</td>
+          <td className="p-2">{vehiculoBuscado.modelo}</td>
+          <td className="p-2">{vehiculoBuscado.tipo}</td>
+          <td className="p-2">{vehiculoBuscado.cliente_cedula}</td>
+          <td className="p-2">
+            <button
+              className="text-green-600 hover:text-green-800"
+              onClick={() => setEditableVehiculo(vehiculoBuscado)}
+            >
+              <FaEdit />
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+)}
+
 
       <div className="overflow-x-auto rounded-lg shadow bg-white">
+        {editableVehiculo && (
+  <div className="border rounded p-4 bg-gray-50 mt-2 space-y-3">
+    <h3 className="font-bold text-[#001A30]">Editar Vehículo</h3>
+    <input
+      type="text"
+      value={editableVehiculo.marca}
+      onChange={(e) =>
+        setEditableVehiculo({ ...editableVehiculo, marca: e.target.value })
+      }
+      placeholder="Marca"
+      className="border p-2 rounded w-full"
+    />
+    <input
+      type="text"
+      value={editableVehiculo.modelo}
+      onChange={(e) =>
+        setEditableVehiculo({ ...editableVehiculo, modelo: e.target.value })
+      }
+      placeholder="Modelo"
+      className="border p-2 rounded w-full"
+    />
+    <input
+      type="text"
+      value={editableVehiculo.tipo}
+      onChange={(e) =>
+        setEditableVehiculo({ ...editableVehiculo, tipo: e.target.value })
+      }
+      placeholder="Tipo"
+      className="border p-2 rounded w-full"
+    />
+    <button
+      onClick={actualizarVehiculo}
+      className="bg-green-600 text-white px-4 py-2 rounded"
+    >
+      Guardar Cambios
+    </button>
+  </div>
+)}
+
         <table className="min-w-full text-sm">
           <thead className="bg-blue-100 text-blue-800">
             <tr>
