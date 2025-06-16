@@ -76,6 +76,41 @@ const [mostrarFormulario, setMostrarFormulario] = useState(false)
   }
 }
 
+const handleEstadoChange = async (ordenId: string, nuevoEstado: string) => {
+  try {
+    const res = await fetch(`http://localhost:5000/api/orden/${ordenId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ estado: nuevoEstado })
+    })
+
+    if (!res.ok) throw new Error('Error en la actualización')
+
+    // ✅ Actualiza en tabla principal
+    setOrdenes(prev =>
+      prev.map(orden =>
+        orden.orden_id === ordenId ? { ...orden, estado: nuevoEstado } : orden
+      )
+    )
+
+    // ✅ También actualiza en resultado de búsqueda (si hay)
+    setResultadoBusqueda(prev => {
+      if (!prev) return null
+      const arreglo = Array.isArray(prev) ? prev : [prev]
+      const actualizados = arreglo.map(orden =>
+        orden.orden_id === ordenId ? { ...orden, estado: nuevoEstado } : orden
+      )
+      return Array.isArray(prev) ? actualizados : actualizados[0]
+    })
+  } catch (error) {
+    console.error('Error al cambiar estado:', error)
+    alert('No se pudo actualizar el estado')
+  }
+}
+
+
 
   const actualizarOrden = async () => {
     try {
@@ -106,7 +141,7 @@ const [mostrarFormulario, setMostrarFormulario] = useState(false)
     fetchOrdenes()
   }, [])
 
-  const renderTabla = (data: Orden[]) => (
+  const renderTabla = (data: Orden[], estadoChangeHandler: (id: string, estado: string) => void = () => {}) => (
     <table className="min-w-full text-sm">
       <thead className="bg-blue-100 text-blue-800 font-medium">
         <tr>
@@ -128,7 +163,18 @@ const [mostrarFormulario, setMostrarFormulario] = useState(false)
             <td className="p-3 text-[#001A30]">{orden.cliente_cedula}</td>
             <td className="p-3 text-[#001A30]">{orden.placa}</td>
             <td className="p-3 text-[#001A30]">{new Date(orden.fecha).toLocaleDateString()}</td>
-            <td className="p-3 text-[#001A30]">{orden.estado}</td>
+            <td className="p-3">
+  <select
+    value={orden.estado}
+    onChange={(e) => estadoChangeHandler(orden.orden_id, e.target.value)}
+    className="border border-gray-300 rounded px-2 py-1 text-sm"
+  >
+    <option value="En Proceso">En Proceso</option>
+    <option value="Finalizada">Finalizada</option>
+    <option value="Recibida">Recibida</option>
+  </select>
+</td>
+
             <td className="p-3">
               <span className="px-2 py-1 text-xs rounded bg-gray-300 text-gray-800 font-semibold">
                 {getNombreCiudad(orden.ciudad_id)}
@@ -194,12 +240,7 @@ const getNombrePago = (id: number) => {
             Buscar por Cédula
           </button>
           <CrearOrdenModal onSuccess={() => window.location.reload()} />
-          <button
-            onClick={actualizarOrden}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-semibold transition"
-          >
-            Actualizar Orden
-          </button>
+
         </div>
 
     {mostrarFormulario && (
@@ -261,11 +302,15 @@ const getNombrePago = (id: number) => {
         {resultadoBusqueda && (
           <div className="mt-6">
             <h3 className="text-xl font-bold text-[#001A30] mb-2">Resultado de Búsqueda</h3>
-            {renderTabla(Array.isArray(resultadoBusqueda) ? resultadoBusqueda : [resultadoBusqueda])}
+            {renderTabla(
+  Array.isArray(resultadoBusqueda) ? resultadoBusqueda : [resultadoBusqueda],
+  handleEstadoChange
+)}
+
           </div>
         )}
 
-        {renderTabla(ordenes)}
+        {renderTabla(ordenes, handleEstadoChange)}
       </div>
     </div>
   )

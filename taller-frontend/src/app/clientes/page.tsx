@@ -25,6 +25,8 @@ export default function ClientesPage() {
   const [showModal, setShowModal] = useState(false)
   const [clientes, setClientes] = useState<Cliente[]>([])
   const [ciudad, setCiudad] = useState<string | undefined>('quito')
+const [busquedaCedula, setBusquedaCedula] = useState('')
+const [clienteBuscado, setClienteBuscado] = useState<Cliente | null>(null)
 
   const handleDelete = async (cedula: string) => {
     const confirmed = window.confirm('¿Estás seguro de eliminar este cliente?');
@@ -39,6 +41,49 @@ export default function ClientesPage() {
       alert('Error al eliminar el cliente: ' + result.message);
     }
   };
+
+  const buscarClientePorCedula = async () => {
+  try {
+    const res = await fetch(`http://localhost:5000/api/cliente/${busquedaCedula}`)
+    const data = await res.json()
+    if (data && data.cedula) {
+      setClienteBuscado(data)
+    } else {
+      alert('Cliente no encontrado')
+      setClienteBuscado(null)
+    }
+  } catch (error) {
+    console.error('Error al buscar cliente:', error)
+    alert('No se pudo encontrar el cliente')
+  }
+}
+
+
+const actualizarCliente = async () => {
+   if (!clienteBuscado) return;
+  try {
+    const res = await fetch(`http://localhost:5000/api/cliente/${clienteBuscado.cedula}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nombre: clienteBuscado.nombre,
+        telefono: clienteBuscado.telefono,
+        correo: clienteBuscado.correo
+      })
+    })
+    if (!res.ok) throw new Error('Error en actualización')
+    alert('Cliente actualizado correctamente')
+    setClienteBuscado(null) // limpiar el formulario
+     // 🔄 Actualiza tabla visual
+    const updated = await getClientes(ciudad)
+    setClientes(updated)
+    setClienteBuscado(null)
+  } catch (error) {
+    console.error('Error actualizando cliente:', error)
+    alert('Error al actualizar cliente')
+  }
+}
+
 
   useEffect(() => {
     async function fetchData() {
@@ -75,6 +120,21 @@ export default function ClientesPage() {
           ))}
         </select>
       </div>
+<div className="mb-4 flex gap-2">
+  <input
+    type="text"
+    placeholder="Buscar por cédula"
+    value={busquedaCedula}
+    onChange={(e) => setBusquedaCedula(e.target.value)}
+    className="border p-2 rounded text-sm"
+  />
+  <button
+    onClick={buscarClientePorCedula}
+    className="bg-blue-600 text-white px-3 py-1 rounded"
+  >
+    Buscar
+  </button>
+</div>
 
       <div className="overflow-x-auto rounded-lg shadow bg-white">
         <table className="min-w-full text-sm">
@@ -107,9 +167,14 @@ export default function ClientesPage() {
                   </span>
                 </td>
                 <td className="p-3 flex gap-2">
-                  <button className="text-blue-600 hover:text-blue-800" title="Editar">
-                    <FaEdit />
-                  </button>
+                  <button
+  className="text-blue-600 hover:text-blue-800"
+  title="Editar"
+  onClick={() => setClienteBuscado(cliente)}
+>
+  <FaEdit />
+</button>
+
                   <button className="text-red-600 hover:text-red-800"
                     title="Eliminar"
                     onClick={() => handleDelete(cliente.cedula)}>
@@ -132,6 +197,46 @@ export default function ClientesPage() {
           onCreated={() => getClientes(ciudad).then(setClientes)}
         />
       )}
+
+      {clienteBuscado && (
+  <div className="border rounded p-4 bg-gray-50 mt-2 space-y-3">
+    <h3 className="font-bold text-[#001A30]">Editar Cliente</h3>
+    <input
+      type="text"
+      value={clienteBuscado.nombre}
+      onChange={(e) =>
+        setClienteBuscado({ ...clienteBuscado, nombre: e.target.value })
+      }
+      placeholder="Nombre"
+      className="border p-2 rounded w-full"
+    />
+    <input
+      type="text"
+      value={clienteBuscado.telefono}
+      onChange={(e) =>
+        setClienteBuscado({ ...clienteBuscado, telefono: e.target.value })
+      }
+      placeholder="Teléfono"
+      className="border p-2 rounded w-full"
+    />
+    <input
+      type="email"
+      value={clienteBuscado.correo}
+      onChange={(e) =>
+        setClienteBuscado({ ...clienteBuscado, correo: e.target.value })
+      }
+      placeholder="Correo"
+      className="border p-2 rounded w-full"
+    />
+    <button
+      onClick={actualizarCliente}
+      className="bg-green-600 text-white px-4 py-2 rounded"
+    >
+      Guardar Cambios
+    </button>
+  </div>
+)}
+
     </div>
   )
 }

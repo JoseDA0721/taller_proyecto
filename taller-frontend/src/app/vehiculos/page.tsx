@@ -17,7 +17,7 @@ interface Vehiculo {
 export default function VehiculosPage() {
   const [vehiculos, setVehiculos] = useState<Vehiculo[]>([])
   const [showModal, setShowModal] = useState(false)
-  
+
   const handleDelete = async (placa: string) => {
     const confirmar = window.confirm('¿Estás seguro de eliminar este vehículo?');
     if (!confirmar) return;
@@ -33,31 +33,31 @@ export default function VehiculosPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-  const res = await fetch('http://localhost:5000/api/vehiculos')
-  const data = await res.json()
-  console.log('Vehículos recibidos:', data)
+        const res = await fetch('http://localhost:5000/api/vehiculos')
+        const data = await res.json()
+        console.log('Vehículos recibidos:', data)
 
-  if (Array.isArray(data)) {
-    const tipos = {
-      1: 'Sedán',
-      2: 'SUV',
-      3: 'Pickup'
-    }
+        if (Array.isArray(data)) {
+          const tipos = {
+            1: 'Sedán',
+            2: 'SUV',
+            3: 'Pickup'
+          }
 
-    const vehiculosTransformados = data.map((vehiculo: any) => ({
-  ...vehiculo,
-  tipo: tipos[vehiculo.tipo_id as keyof typeof tipos] || 'Desconocido'
-}))
+          const vehiculosTransformados = data.map((vehiculo: any) => ({
+            ...vehiculo,
+            tipo: tipos[vehiculo.tipo_id as keyof typeof tipos] || 'Desconocido'
+          }))
 
 
-    setVehiculos(vehiculosTransformados)
-  } else {
-    setVehiculos([])
-  }
-} catch (error) {
-  console.error('Error al obtener vehículos:', error)
-  setVehiculos([])
-}
+          setVehiculos(vehiculosTransformados)
+        } else {
+          setVehiculos([])
+        }
+      } catch (error) {
+        console.error('Error al obtener vehículos:', error)
+        setVehiculos([])
+      }
 
     }
     fetchData()
@@ -68,12 +68,12 @@ export default function VehiculosPage() {
       <div className="flex justify-between items-center">
         <h2 className="text-3xl font-bold text-[#001A30]">Listado de Vehículos (Global)</h2>
         <button
-  className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-  onClick={() => setShowModal(true)}
->
-  <FaPlus />
-  Nuevo Vehículo
-</button>
+          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+          onClick={() => setShowModal(true)}
+        >
+          <FaPlus />
+          Nuevo Vehículo
+        </button>
 
       </div>
 
@@ -112,25 +112,25 @@ export default function VehiculosPage() {
           </tbody>
         </table>
         {showModal && (
-  <VehiculoFormModal
-    onClose={() => setShowModal(false)}
-    onCreated={async () => {
-  setShowModal(false)
-  try {
-    const res = await fetch('http://localhost:5000/api/vehiculos')
-    const data = await res.json()
-    if (Array.isArray(data)) {
-      setVehiculos(data)
-    } else {
-      setVehiculos([])
-    }
-  } catch (error) {
-    console.error('Error al refrescar vehículos:', error)
-    setVehiculos([])
-  }
-}}
-  />
-)}
+          <VehiculoFormModal
+            onClose={() => setShowModal(false)}
+            onCreated={async () => {
+              setShowModal(false)
+              try {
+                const res = await fetch('http://localhost:5000/api/vehiculos')
+                const data = await res.json()
+                if (Array.isArray(data)) {
+                  setVehiculos(data)
+                } else {
+                  setVehiculos([])
+                }
+              } catch (error) {
+                console.error('Error al refrescar vehículos:', error)
+                setVehiculos([])
+              }
+            }}
+          />
+        )}
 
       </div>
     </div>
