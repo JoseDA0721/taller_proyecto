@@ -38,17 +38,33 @@ exports.getVehiculoByCliente = async (req, res) =>{
 
 
 exports.createVehiculo = async (req, res) => {
+    const { quitoPool: pool } = require('../config/db');
     const { placa, marca, modelo, tipo_id, cliente_cedula } = req.body;
+
     if (!placa || !marca || !modelo || !tipo_id || !cliente_cedula) {
-        return res.status(400).json({ message: 'Todos los campos son requeridos.' });
+        return res.status(400).json({ success: false, message: 'Todos los campos son requeridos.' });
     }
+
     try {
         const query = 'INSERT INTO vehiculos (placa, marca, modelo, tipo_id, cliente_cedula) VALUES ($1, $2, $3, $4, $5) RETURNING *';
         const result = await pool.query(query, [placa, marca, modelo, tipo_id, cliente_cedula]);
-        res.status(201).json({ message: 'Vehículo creado exitosamente.', data: result.rows[0] });
+        
+        res.status(201).json({ success: true, message: 'Vehículo creado exitosamente.', data: result.rows[0] });
+
     } catch (err) {
-        // El trigger en la BD se encargará de validar si el cliente_cedula existe
-        res.status(500).json({ error: err.message });
+        // **MEJORA CLAVE**: Verificamos el mensaje de error específico del trigger.
+        if (err.message.includes('no existe en la vista global de clientes')) {
+            return res.status(400).json({ success: false, message: `La cédula del dueño (${cliente_cedula}) no existe o no es visible. Por favor, verifique la cédula o intente de nuevo.` });
+        }
+        
+        // Verificamos si el error es por placa duplicada
+        if (err.code === '23505' && err.constraint === 'vehiculos_pkey') {
+             return res.status(400).json({ success: false, message: `La placa (${placa}) ya está registrada.` });
+        }
+        
+        // Para cualquier otro error inesperado, mantenemos el 500
+        console.error("Error inesperado en createVehiculo:", err); // Log para depuración
+        res.status(500).json({ success: false, message: 'Ocurrió un error inesperado en el servidor.' });
     }
 };
 

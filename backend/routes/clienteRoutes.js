@@ -7,7 +7,8 @@ const {
     getClienteByCedula,
     createCliente,
     updateCliente,
-    deleteCliente
+    deleteCliente,
+    getClienteDetails
 } = require('../controllers/clienteController');
 
 // Definir las rutas del CRUD
@@ -25,5 +26,7 @@ router.put('/cliente/:cedula', updateCliente);
 
 // DELETE /api/clientes/:cedula -> Eliminar un cliente
 router.delete('/cliente/:cedula', deleteCliente);
+
+router.get('/cliente/:cedula/details', getClienteDetails);
 
 module.exports = router;

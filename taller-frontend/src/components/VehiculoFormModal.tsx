@@ -1,9 +1,14 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { FaTimes } from 'react-icons/fa'
 import { createVehiculo } from '@/services/vehiculoService';
+import { fetchTiposVehiculo } from '@/services/catalogoApi';
 
+interface TipoVehiculo {
+  tipo_id: number;
+  nombre: string;
+}
 
 interface Props {
   onClose: () => void
@@ -18,32 +23,52 @@ export default function VehiculoFormModal({ onClose, onCreated }: Props) {
     tipo_id: '',
     cliente_cedula: '',
   })
+  const [tipos, setTipos] = useState<TipoVehiculo[]>([]);
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  useEffect(() => {
+    async function loadTipos() {
+      try {
+        const tiposData = await fetchTiposVehiculo();
+        setTipos(tiposData);
+      } catch (err) {
+        setError("No se pudieron cargar los tipos de vehículo.");
+        console.error(err);
+      }
+    }
+    loadTipos();
+  }, []);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setLoading(true);
-  setError('');
+    e.preventDefault();
+    setLoading(true);
+    setError('');
 
-  const result = await createVehiculo({
-    ...form,
-    tipo_id: Number(form.tipo_id),
-  });
+    if (!form.placa || !form.marca || !form.modelo || !form.tipo_id || !form.cliente_cedula) {
+        setError('Todos los campos son obligatorios.');
+        setLoading(false);
+        return;
+    }
 
-  setLoading(false);
+    const result = await createVehiculo({
+      ...form,
+      tipo_id: Number(form.tipo_id),
+    });
 
-  if (result.success) {
-    onCreated();
-    onClose();
-  } else {
-    setError(result.message || 'Error al registrar vehículo');
-  }
-};
+    setLoading(false);
+
+    if (result.success) {
+      onCreated();
+      onClose();
+    } else {
+      setError(result.message || 'Error al registrar vehículo');
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
@@ -77,13 +102,20 @@ export default function VehiculoFormModal({ onClose, onCreated }: Props) {
             value={form.modelo}
             onChange={handleChange}
           />
-          <input
+          
+          <select
             name="tipo_id"
-            placeholder="ID del Tipo (ej. 1)"
-            className="w-full border p-2 rounded text-gray-900"
             value={form.tipo_id}
             onChange={handleChange}
-          />
+            className="w-full border p-2 rounded text-gray-900 bg-white"
+          >
+            <option value="" disabled>Seleccione un tipo de vehículo</option>
+            {tipos.map((tipo) => (
+              <option key={tipo.tipo_id} value={tipo.tipo_id}>
+                {tipo.nombre}
+              </option>
+            ))}
+          </select>
 
           <input
             name="cliente_cedula"

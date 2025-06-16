@@ -60,3 +60,16 @@ export async function updateCliente(cedula: string, cliente: any) {
     return { success: false, message: (error as Error).message };
   }
 }
+
+export async function getClienteDetails(cedula: string) {
+  try {
+    const res = await fetch(`${BASE_URL}/cliente/${cedula}/details`);
+    const data = await res.json();
+    if (!res.ok) {
+      return { success: false, message: data.message || 'Error al validar cliente' };
+    }
+    return data;
+  } catch (error) {
+      return { success: false, message: 'Error de conexión al validar cliente' };
+  }
+}
