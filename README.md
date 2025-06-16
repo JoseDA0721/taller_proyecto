@@ -107,19 +107,19 @@ DB_USER_QUITO=taller_user
 DB_HOST_QUITO=localhost
 DB_DATABASE_QUITO=taller_db
 DB_PASSWORD_QUITO=taller_password_local
-DB_PORT_QUITO=5433
+DB_PORT_QUITO=5434
 
 DB_USER_GUAYAQUIL=taller_user
 DB_HOST_GUAYAQUIL=localhost
 DB_DATABASE_GUAYAQUIL=taller_db
 DB_PASSWORD_GUAYAQUIL=taller_password_local
-DB_PORT_GUAYAQUIL=5434
+DB_PORT_GUAYAQUIL=5435
 
 DB_USER_CUENCA=taller_user
 DB_HOST_CUENCA=localhost
 DB_DATABASE_CUENCA=taller_db
 DB_PASSWORD_CUENCA=taller_password_local
-DB_PORT_CUENCA=5435
+DB_PORT_CUENCA=5436
 ```
 
 ### Paso 4: Instalar Dependencias y Ejecutar
